@@ -2,7 +2,7 @@
 
 import { ReactNode, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Menu, X, LayoutDashboard, Book, Tag, Settings, LogOut, Plus } from "lucide-react";
+import { Menu, X, LayoutDashboard, Book, Tag, LogOut } from "lucide-react";
 import Cookies from "js-cookie";
 import Link from "next/link";
 

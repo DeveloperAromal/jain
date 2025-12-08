@@ -1,18 +1,30 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAPICall } from "@/app/hooks/useApiCall";
 import { ApiEndPoints } from "@/app/config/Backend";
-import { useParams, useRouter } from "next/navigation";
-import { Play, Clock, CheckCircle2, Circle, BookOpen, Lock, Crown } from "lucide-react";
+import { useParams } from "next/navigation";
+import { Play, Clock, CheckCircle2, BookOpen, Lock, Crown } from "lucide-react";
 import Link from "next/link";
 import Cookies from "js-cookie";
 import { Course, Topic } from "@/app/types/dashboardTypes";
 
+const normalizeIsFree = (
+  value: Course["is_free"] | string | number | undefined | null
+) => {
+  if (typeof value === "string") {
+    const lowered = value.toLowerCase();
+    return lowered === "true" || lowered === "1";
+  }
+  if (typeof value === "number") {
+    return value === 1;
+  }
+  return value === true;
+};
+
 export default function CoursePage() {
   const params = useParams();
-  const router = useRouter();
   const courseId = params.id as string;
 
   const { makeApiCall } = useAPICall();
@@ -24,7 +36,7 @@ export default function CoursePage() {
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [completedTopics, setCompletedTopics] = useState<Set<string>>(new Set());
 
-  const getTopics = async () => {
+  const getTopics = useCallback(async () => {
     try {
       setLoading(true);
       const token = Cookies.get("token");
@@ -44,10 +56,7 @@ export default function CoursePage() {
       const courseData = (courseResponse?.data?.data?.course || courseResponse?.data?.course || courseResponse?.data) as Course;
       setCourse(courseData);
 
-      const isFree = courseData?.is_free === true || 
-                     courseData?.is_free === "true" || 
-                     courseData?.is_free === 1 ||
-                     String(courseData?.is_free).toLowerCase() === "true";
+      const isFree = normalizeIsFree(courseData?.is_free);
       
       if (isFree) {
         setHasAccess(true);
@@ -70,9 +79,9 @@ export default function CoursePage() {
         } finally {
           setCheckingAccess(false);
         }
-      }
+    }
 
-      const topicsResponse = await makeApiCall(
+    const topicsResponse = await makeApiCall(
         "GET",
         `${ApiEndPoints.GET_TOPICS_BY_COURSE}/${courseId}`,
         null,
@@ -83,10 +92,7 @@ export default function CoursePage() {
       const fetchedTopics = (topicsResponse?.data?.topics || topicsResponse?.topics || []) as Topic[];
       setTopics(fetchedTopics);
 
-      const isFreeCourse = courseData?.is_free === true || 
-                           courseData?.is_free === "true" || 
-                           courseData?.is_free === 1 ||
-                           String(courseData?.is_free).toLowerCase() === "true";
+      const isFreeCourse = normalizeIsFree(courseData?.is_free);
       if (fetchedTopics.length > 0 && (hasAccess || isFreeCourse)) {
         setSelectedTopic(fetchedTopics[0]);
       }
@@ -95,13 +101,13 @@ export default function CoursePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [courseId, hasAccess, makeApiCall]);
 
   useEffect(() => {
     if (courseId) {
       getTopics();
     }
-  }, [courseId]);
+  }, [courseId, getTopics]);
 
   const handleMarkAsViewed = () => {
     if (selectedTopic) {
@@ -122,10 +128,7 @@ export default function CoursePage() {
     );
   }
 
-  const isFreeCourse = course?.is_free === true || 
-                       course?.is_free === "true" || 
-                       course?.is_free === 1 ||
-                       String(course?.is_free).toLowerCase() === "true";
+  const isFreeCourse = normalizeIsFree(course?.is_free);
   
   if (!hasAccess && course && !isFreeCourse) {
     return (

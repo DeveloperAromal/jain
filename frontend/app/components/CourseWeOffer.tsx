@@ -9,7 +9,6 @@ import {
   Calculator,
   Circle,
   Activity,
-  Grid,
   Sigma,
   TrendingUp,
 } from "lucide-react";
@@ -121,7 +120,7 @@ export default function CourseWeOffer() {
                 hover:shadow-xl transition-all snap-center
               "
             >
-              <div className="mb-4 flex justify-center sm:justify-start">{course.icon}</div>
+              <div className="mb-4 flex justify-center">{course.icon}</div>
 
               <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-foreground">
                 {course.name}

@@ -23,7 +23,7 @@ export default function AdminLogin() {
     try {
       const response = await makeApiCall(
         "POST",
-        ApiEndPoints.LOGIN_USER,
+        ApiEndPoints.ADMIN_LOGIN,
         { email, password },
         "application/json"
       );
@@ -35,8 +35,16 @@ export default function AdminLogin() {
       } else {
         setError("Invalid response from server");
       }
-    } catch (err: any) {
-      setError(err?.response?.data?.message || err?.message || "Login failed");
+    } catch (err: unknown) {
+      if (err && typeof err === "object" && "response" in err) {
+        // @ts-expect-error narrow axios-like error shape
+        const message = err.response?.data?.message;
+        setError(message || "Login failed");
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Login failed");
+      }
     } finally {
       setLoading(false);
     }

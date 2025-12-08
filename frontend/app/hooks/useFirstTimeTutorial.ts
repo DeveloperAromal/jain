@@ -1,15 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export function useFirstTimeTutorial() {
-  const [showTutorial, setShowTutorial] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(() => {
+    if (typeof window === "undefined") return false;
 
-  useEffect(() => {
     const seenTutorial = localStorage.getItem("seenTutorial");
-
     if (!seenTutorial) {
-      setShowTutorial(true);
       localStorage.setItem("seenTutorial", "true");
+      return true;
     }
-  }, []);
+    return false;
+  });
+
   return { showTutorial, setShowTutorial };
 }

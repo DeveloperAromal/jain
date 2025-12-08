@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,10 +7,7 @@ import { ApiEndPoints } from "@/app/config/Backend";
 import {
   Crown,
   CheckCircle2,
-  X,
   Loader2,
-  Calendar,
-  BookOpen,
 } from "lucide-react";
 import Image from "next/image";
 import Cookies from "js-cookie";
@@ -64,6 +60,8 @@ export default function PaymentPage() {
   const router = useRouter();
   const { makeApiCall } = useAPICall();
 
+  // loading state not displayed; kept for potential future UI toggles
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [promoCode, setPromoCode] = useState("");
@@ -152,6 +150,7 @@ export default function PaymentPage() {
               setError("Payment verification failed");
             }
           } catch (err) {
+            console.error(err);
             setError("Payment verification failed. Please contact support.");
           } finally {
             setProcessing(false);
@@ -169,6 +168,7 @@ export default function PaymentPage() {
 
       new window.Razorpay(options).open();
     } catch (err) {
+      console.error(err);
       setError("Failed to initiate payment");
       setProcessing(false);
     }
@@ -251,8 +251,7 @@ export default function PaymentPage() {
           </div>
 
           <div className="pt-4 border-t border-border flex items-center gap-2 text-sm text-text-secondary">
-            <Calendar className="w-4 h-4" /> Valid for 12 months from payment
-            date
+            Valid for 12 months from payment date
           </div>
         </div>
 

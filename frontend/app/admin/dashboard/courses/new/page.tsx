@@ -23,7 +23,6 @@ export default function NewCourse() {
     price: 0,
     thumbnail_url: "",
   });
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string>("");
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,7 +34,6 @@ export default function NewCourse() {
       return;
     }
 
-    setThumbnailFile(file);
     setThumbnailPreview(URL.createObjectURL(file));
 
     try {
@@ -88,8 +86,15 @@ export default function NewCourse() {
       );
 
       router.push("/admin/dashboard/courses");
-    } catch (error: any) {
-      alert(error?.response?.data?.message || "Failed to create course");
+    } catch (error: unknown) {
+      const message =
+        typeof error === "object" && error !== null && "response" in error
+          ? // @ts-expect-error partial axios shape
+            error.response?.data?.message
+          : error instanceof Error
+            ? error.message
+            : "Failed to create course";
+      alert(message || "Failed to create course");
     } finally {
       setLoading(false);
     }
@@ -180,7 +185,6 @@ export default function NewCourse() {
                 <button
                   type="button"
                   onClick={() => {
-                    setThumbnailFile(null);
                     setThumbnailPreview("");
                     setFormData({ ...formData, thumbnail_url: "" });
                   }}

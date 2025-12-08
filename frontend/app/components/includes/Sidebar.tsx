@@ -3,15 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
-import {
-  Home,
-  Book,
-  LayoutDashboard,
-  Settings,
-  FileText,
-  Users,
-  LineChart,
-} from "lucide-react";
+import { Book, LayoutDashboard, Settings, FileText, Users, LineChart } from "lucide-react";
 
 export default function Sidebar({ isOpen = false, onClose }: { isOpen?: boolean; onClose?: () => void }) {
   const pathname = usePathname();

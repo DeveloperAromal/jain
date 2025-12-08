@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAPICall } from "@/app/hooks/useApiCall";
 import { ApiEndPoints } from "@/app/config/Backend";
-import { Crown, Clock, CheckCircle2 } from "lucide-react";
+import { Crown, Clock } from "lucide-react";
 import Link from "next/link";
 import Cookies from "js-cookie";
 import { SubscriptionStatus } from "@/app/types/dashboardTypes";
@@ -49,7 +49,6 @@ export default function SubscriptionStatusBar() {
     daysRemaining, 
     hasPaidSubscription, 
     subscriptionType,
-    subscriptionEndDate,
     subscriptionDaysRemaining 
   } = subscriptionStatus;
 

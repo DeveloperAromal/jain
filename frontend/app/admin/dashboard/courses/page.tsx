@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAPICall } from "@/app/hooks/useApiCall";
 import { ApiEndPoints } from "@/app/config/Backend";
 import { Plus, Edit, Trash2, BookOpen, Crown } from "lucide-react";
@@ -13,11 +13,7 @@ export default function AdminCourses() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchCourses();
-  }, []);
-
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     try {
       const token = Cookies.get("admin_token");
       if (!token) return;
@@ -37,7 +33,11 @@ export default function AdminCourses() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [makeApiCall]);
+
+  useEffect(() => {
+    fetchCourses();
+  }, [fetchCourses]);
 
   const handleToggleFree = async (courseId: string | number, isFree: boolean) => {
     try {

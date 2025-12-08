@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState, useCallback } from "react";
+import { useParams } from "next/navigation";
 import { useAPICall } from "@/app/hooks/useApiCall";
 import { ApiEndPoints } from "@/app/config/Backend";
-import { ArrowLeft, Plus, Upload, Loader2, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Upload, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Cookies from "js-cookie";
 import { Course, Topic } from "@/app/types/dashboardTypes";
@@ -13,7 +13,6 @@ import Image from "next/image";
 
 export default function CourseDetails() {
   const params = useParams();
-  const router = useRouter();
   const courseId = params.id as string;
   const { makeApiCall } = useAPICall();
 
@@ -35,14 +34,7 @@ export default function CourseDetails() {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 
-  useEffect(() => {
-    if (courseId) {
-      fetchCourse();
-      fetchTopics();
-    }
-  }, [courseId]);
-
-  const fetchCourse = async () => {
+  const fetchCourse = useCallback(async () => {
     try {
       const token = Cookies.get("admin_token");
       if (!token) return;
@@ -62,9 +54,9 @@ export default function CourseDetails() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [courseId, makeApiCall]);
 
-  const fetchTopics = async () => {
+  const fetchTopics = useCallback(async () => {
     try {
       const token = Cookies.get("admin_token");
       if (!token) return;
@@ -82,7 +74,14 @@ export default function CourseDetails() {
     } catch (error) {
       console.error("Error fetching topics:", error);
     }
-  };
+  }, [courseId, makeApiCall]);
+
+  useEffect(() => {
+    if (courseId) {
+      fetchCourse();
+      fetchTopics();
+    }
+  }, [courseId, fetchCourse, fetchTopics]);
 
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

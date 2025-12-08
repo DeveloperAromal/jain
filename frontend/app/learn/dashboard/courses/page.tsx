@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAPICall } from "@/app/hooks/useApiCall";
 import { ApiEndPoints } from "@/app/config/Backend";
 import {
@@ -16,16 +15,15 @@ import {
   Crown,
 } from "lucide-react";
 import Cookies from "js-cookie";
-import { Course, SubscriptionStatus } from "@/app/types/dashboardTypes";
+import { Course } from "@/app/types/dashboardTypes";
 
 export default function Courses() {
   const { makeApiCall } = useAPICall();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const getAllAvailableCourses = async () => {
+  const getAllAvailableCourses = useCallback(async () => {
     try {
       setLoading(true);
       const token = Cookies.get("token");
@@ -45,7 +43,6 @@ export default function Courses() {
       const responseData = response?.data?.data;
 
       setCourses((responseData?.courses || []) as Course[]);
-      setSubscriptionStatus((responseData?.subscriptionStatus || null) as SubscriptionStatus | null);
 
       console.log("Courses:", responseData?.courses);
       console.log("Subscription:", responseData?.subscriptionStatus);
@@ -54,11 +51,11 @@ export default function Courses() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [makeApiCall]);
 
   useEffect(() => {
     getAllAvailableCourses();
-  }, []);
+  }, [getAllAvailableCourses]);
 
   const filteredCourses = courses.filter((course) => {
     const query = searchQuery.toLowerCase();
