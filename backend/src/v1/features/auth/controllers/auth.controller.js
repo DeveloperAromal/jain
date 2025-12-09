@@ -1,6 +1,5 @@
 import {
   signInAdmin, 
-  validateAdmin,
 } from "../services/auth.service.js";
 
 export const signInAdminUser = async (req, res) => {

@@ -1,6 +1,5 @@
 import {
   signInAdminUser,
-  validateAdminUser,
 } from "../controllers/auth.controller.js";
 import {
   signUpStudent,
@@ -105,7 +104,6 @@ router.post("/admin/login", signInAdminUser);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get("/admin/validate", Protect, validateAdminUser);
 
 /**
  * @swagger
