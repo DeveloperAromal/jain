@@ -105,7 +105,7 @@ export default function AuthModal() {
       "
     >
       {/* Title */}
-      <h1 className="text-2xl font-semibold text-center text-foreground col-span-2">
+      <h1 className="text-2xl font-semibold text-center text-foreground/80 col-span-2">
         {isLogin ? "Welcome Back 👋" : "Create Your Account"}
       </h1>
 
@@ -116,11 +116,11 @@ export default function AuthModal() {
       </p>
 
       {/* Form Grid */}
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-2">
         {/* Name (Signup only) */}
         {!isLogin && (
           <div className="space-y-1">
-            <label className="text-sm font-medium text-foreground">
+            <label className="text-sm font-medium text-foreground/80/80">
               Full Name
             </label>
             <input
@@ -137,7 +137,7 @@ export default function AuthModal() {
         <div
           className={`space-y-1 ${isLogin ? "lg:col-span-2" : "lg:col-span-2"}`}
         >
-          <label className="text-sm font-medium text-foreground">Email</label>
+          <label className="text-sm font-medium text-foreground/80">Email</label>
           <input
             type="email"
             placeholder="eg: user@gmail.com"
@@ -150,7 +150,7 @@ export default function AuthModal() {
         {/* Phone (Signup only) */}
         {!isLogin && (
           <div className="space-y-1">
-            <label className="text-sm font-medium text-foreground">
+            <label className="text-sm font-medium text-foreground/80">
               Phone Number
             </label>
             <input
@@ -166,7 +166,7 @@ export default function AuthModal() {
         {/* Class (Signup only) */}
         {!isLogin && (
           <div className="space-y-1">
-            <label className="text-sm font-medium text-foreground">Class</label>
+            <label className="text-sm font-medium text-foreground/80">Class</label>
             <input
               type="text"
               placeholder="eg: 10, 11, 12"
@@ -179,7 +179,7 @@ export default function AuthModal() {
 
         {/* Password */}
         <div className="space-y-1 lg:col-span-2">
-          <label className="text-sm font-medium text-foreground">
+          <label className="text-sm font-medium text-foreground/80">
             Password
           </label>
           <input
@@ -208,7 +208,7 @@ export default function AuthModal() {
       </div>
 
       {/* Toggle */}
-      <p className="text-center text-sm mt-6 text-foreground">
+      <p className="text-center text-sm mt-6 text-foreground/80">
         {isLogin ? (
           <>
             Don’t have an account?{" "}
