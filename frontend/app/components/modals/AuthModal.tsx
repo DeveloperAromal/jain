@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAPICall } from "@/app/hooks/useApiCall";
 import { ApiEndPoints } from "@/app/config/Backend";
 import Cookies from "js-cookie";
+import { Eye, EyeOff } from "lucide-react";
 
 interface AuthResponse {
   token: string;
@@ -18,6 +19,8 @@ export default function AuthModal() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPassSame, setIsPassSame] = useState(true);
+const [showPassword, setShowPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [name, setName] = useState("");
   const [studentClass, setStudentClass] = useState("");
@@ -154,20 +157,18 @@ export default function AuthModal() {
           </div>
         )}
 
-        {!isLogin && (
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-foreground/80">
-              Email
-            </label>
-            <input
-              type="email"
-              placeholder="eg: user@gmail.com"
-              className="w-full px-4 py-1.5 border border-border rounded-lg"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-        )}
+        <div className={`space-y-1 w-full ${isLogin ? "lg:col-span-2" : ""}`}>
+          <label className="text-sm font-medium text-foreground/80">
+            Email
+          </label>
+          <input
+            type="email"
+            placeholder="eg: user@gmail.com"
+            className="w-full px-4 py-1.5 border border-border rounded-lg"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
 
         {!isLogin && (
           <div className="space-y-1">
@@ -188,35 +189,59 @@ export default function AuthModal() {
           <label className="text-sm font-medium text-foreground/80">
             Password
           </label>
-          <input
-            type="password"
-            placeholder="Enter your password"
-            className="w-full px-4 py-1.5 border border-border rounded-lg"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div className="relative w-full">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              className="w-full px-4 py-1.5 border border-border rounded-lg"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-2 text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
         </div>
 
-        <div className="space-y-1 lg:col-span-2">
-          <label className="text-sm font-medium text-foreground/80">
-            Password
-          </label>
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className={`w-full px-4 py-1.5 border p-2 rounded-lg ${
-              !isPassSame ? "border-red-500 " : "border-border"
-            }`}
-          />
-        </div>
+        {!isLogin && (
+          <div className="space-y-1 lg:col-span-2">
+            <label className="text-sm font-medium text-foreground/80">
+              Password
+            </label>
+            <div className="relative w-full">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className={`w-full px-4 py-1.5 border rounded-lg ${
+                  !isPassSame ? "border-red-500" : "border-border"
+                }`}
+              />
 
-        {isPassSame ? (
-          <p className="text-green-500 text-sm">Passwords matchs</p>
-        ) : (
-          <p className="text-red-500 text-sm">Passwords do not match</p>
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-2 text-gray-500 hover:text-gray-700"
+              >
+                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+          </div>
         )}
+
+        {!isLogin &&
+          confirmPassword.length > 0 &&
+          (isPassSame ? (
+            <p className="text-green-500 text-sm">Passwords match</p>
+          ) : (
+            <p className="text-red-500 text-sm">Passwords do not match</p>
+          ))}
 
         <div className="lg:col-span-2">
           <button
