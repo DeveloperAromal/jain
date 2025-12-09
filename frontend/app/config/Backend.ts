@@ -1,4 +1,4 @@
-const isProduction = process.env.NODE_ENV === "development";
+const isProduction = process.env.NODE_ENV === "production";
 
 const baseUrl = isProduction
   ? `http://localhost:8080/api/v1`
