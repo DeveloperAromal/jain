@@ -94,7 +94,7 @@ export default function Navbar() {
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setOpen(false)}
           />
-          <div className="relative bg-background rounded-[var(--radius)] p-4 sm:p-6 w-full max-w-md z-10 shadow-[var(--shadow)] max-h-[90vh] overflow-y-auto">
+          <div className="relative bg-background p-4 sm:p-6 w-full rounded-3xl max-w-2xl z-10 max-h-[90vh]">
             <AuthModal />
           </div>
         </div>

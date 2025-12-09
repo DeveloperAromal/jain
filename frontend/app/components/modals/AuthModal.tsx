@@ -16,6 +16,9 @@ export default function AuthModal() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [studentClass, setStudentClass] = useState("");
+
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
@@ -24,7 +27,8 @@ export default function AuthModal() {
   const canSubmit =
     email.includes("@") &&
     password.length >= 6 &&
-    (isLogin || phone.length >= 10) &&
+    (isLogin ||
+      (phone.length >= 10 && name.length >= 2 && studentClass.trim() !== "")) &&
     !loading;
 
   const handleLogin = async () => {
@@ -64,7 +68,13 @@ export default function AuthModal() {
       const res = await makeApiCall(
         "POST",
         ApiEndPoints.REGISTER_USER,
-        { email, phone, password },
+        {
+          email,
+          password,
+          phone,
+          name,
+          student_class: studentClass,
+        },
         "application/json"
       );
 
@@ -86,26 +96,52 @@ export default function AuthModal() {
   };
 
   return (
-    <div className="p-8 w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg border border-border transition-all">
+    <div
+      className="
+        p-8
+        max-w-md 
+        lg:max-w-xl  
+        mx-auto
+      "
+    >
       {/* Title */}
-      <h1 className="text-2xl font-semibold text-center text-foreground">
+      <h1 className="text-2xl font-semibold text-center text-foreground col-span-2">
         {isLogin ? "Welcome Back 👋" : "Create Your Account"}
       </h1>
 
-      <p className="text-center text-sm text-text-secondary mt-1">
+      <p className="text-center text-sm text-text-secondary mt-1 col-span-2">
         {isLogin
           ? "Login to continue your learning journey"
-          : "Join Numora and unlock premium learning experience"}
+          : "Join Jain and unlock premium learning experience"}
       </p>
 
-      <div className="mt-8 space-y-5">
+      {/* Form Grid */}
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Name (Signup only) */}
+        {!isLogin && (
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-foreground">
+              Full Name
+            </label>
+            <input
+              type="text"
+              placeholder="eg: John Doe"
+              className="w-full px-4 py-3 border border-border rounded-lg"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+        )}
+
         {/* Email */}
-        <div className="space-y-1">
+        <div
+          className={`space-y-1 ${isLogin ? "lg:col-span-2" : "lg:col-span-2"}`}
+        >
           <label className="text-sm font-medium text-foreground">Email</label>
           <input
             type="email"
             placeholder="eg: user@gmail.com"
-            className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+            className="w-full px-4 py-3 border border-border rounded-lg"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -120,42 +156,58 @@ export default function AuthModal() {
             <input
               type="tel"
               placeholder="Enter phone number"
-              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+              className="w-full px-4 py-3 border border-border rounded-lg"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
         )}
 
+        {/* Class (Signup only) */}
+        {!isLogin && (
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-foreground">Class</label>
+            <input
+              type="text"
+              placeholder="eg: 10, 11, 12"
+              className="w-full px-4 py-3 border border-border rounded-lg"
+              value={studentClass}
+              onChange={(e) => setStudentClass(e.target.value)}
+            />
+          </div>
+        )}
+
         {/* Password */}
-        <div className="space-y-1">
+        <div className="space-y-1 lg:col-span-2">
           <label className="text-sm font-medium text-foreground">
             Password
           </label>
           <input
             type="password"
             placeholder="Enter your password"
-            className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+            className="w-full px-4 py-3 border border-border rounded-lg"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
 
         {/* Button */}
-        <button
-          disabled={!canSubmit}
-          onClick={isLogin ? handleLogin : handleSignup}
-          className={`w-full py-3 rounded-lg text-white font-semibold transition-all ${
-            canSubmit
-              ? "bg-primary hover:bg-primary-hover shadow-sm"
-              : "bg-gray-300 cursor-not-allowed"
-          }`}
-        >
-          {loading ? "Please wait..." : isLogin ? "Login" : "Create Account"}
-        </button>
+        <div className="lg:col-span-2">
+          <button
+            disabled={!canSubmit}
+            onClick={isLogin ? handleLogin : handleSignup}
+            className={`w-full py-3 rounded-lg text-white font-semibold transition-all ${
+              canSubmit
+                ? "bg-primary hover:bg-primary-hover shadow-sm"
+                : "bg-gray-300 cursor-not-allowed"
+            }`}
+          >
+            {loading ? "Please wait..." : isLogin ? "Login" : "Create Account"}
+          </button>
+        </div>
       </div>
 
-      {/* Toggle Link */}
+      {/* Toggle */}
       <p className="text-center text-sm mt-6 text-foreground">
         {isLogin ? (
           <>

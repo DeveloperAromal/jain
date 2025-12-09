@@ -1,7 +1,7 @@
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === "development";
 
 const baseUrl = isProduction
-  ? `https://jain-wycd.onrender.com/api/v1`
+  ? `http://localhost:8080/api/v1`
   : `${process.env.NEXT_PUBLIC_API_BASE_URL}`;
 
 export const ApiEndPoints = {
