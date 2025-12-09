@@ -127,7 +127,7 @@ router.get("/all-courses", adminGetAllCourses);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put("/admin/toggle-free", Protect, adminToggleCourseFree);
+router.put("/admin/toggle-free", adminToggleCourseFree);
 
 /**
  * @swagger

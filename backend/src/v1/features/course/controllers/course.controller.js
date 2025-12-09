@@ -18,12 +18,12 @@ const isValidUUID = (uuid) => {
 
 export const adminToggleCourseFree = async (req, res) => {
   try {
-    const { courseID, isFree } = req.body;
+    const { courseID, is_free } = req.body;
 
-    if (!courseID || typeof isFree !== "boolean") {
+    if (!courseID || typeof is_free !== "boolean") {
       return res.status(400).json({
         success: false,
-        message: "courseID (string) and isFree (boolean) are required",
+        message: "courseID (string) and is_free (boolean) are required",
       });
     }
 
@@ -34,7 +34,7 @@ export const adminToggleCourseFree = async (req, res) => {
       });
     }
 
-    const updated = await toggleCourseFreeStatus(courseID, isFree);
+    const updated = await toggleCourseFreeStatus(courseID, is_free);
 
     if (!updated || updated.length === 0) {
       return res.status(404).json({
@@ -45,7 +45,7 @@ export const adminToggleCourseFree = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: `Course marked as ${isFree ? "FREE" : "PAID"}`,
+      message: `Course marked as ${is_free ? "FREE" : "PAID"}`,
       course: updated[0],
     });
   } catch (error) {

@@ -64,14 +64,14 @@ export async function getFreeCourses() {
 }
 
 // Admin: Toggle course free/paid status
-export async function toggleCourseFreeStatus(courseID, isFree) {
+export async function toggleCourseFreeStatus(courseID, is_free) {
   if (!courseID) {
     throw new Error("Course ID is required");
   }
 
   const { data, error } = await supabase
     .from("courses")
-    .update({ is_free: isFree })
+    .update({ is_free })
     .eq("id", courseID)
     .select("*");
 
