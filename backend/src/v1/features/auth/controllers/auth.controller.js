@@ -24,24 +24,3 @@ export const signInAdminUser = async (req, res) => {
     res.status(500).json({ message: "Server Error during sign in." });
   }
 };
-
-export const validateAdminUser = async (req, res) => {
-  try {
-    const userId = req.user.id; 
-
-    if (!userId) {
-      return res.status(400).json({ message: "User ID not found in token." });
-    }
-
-    const user = await validateAdmin(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
-    }
-
-    res.status(200).json({ authenticated: true, user });
-  } catch (e) {
-    console.error("Error in validateAdminUser:", e);
-    res.status(500).json({ message: "Server Error during validation." });
-  }
-};

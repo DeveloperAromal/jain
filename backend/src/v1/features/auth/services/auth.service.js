@@ -12,7 +12,7 @@ export const signInAdmin = async ({ email, password }) => {
   }
 
   const { data: userData, error: userError } = await supabase
-    .from("clients")
+    .from("admin")
     .select("*")
     .eq("email", email)
     .single();
@@ -32,50 +32,4 @@ export const signInAdmin = async ({ email, password }) => {
     email: userData.email,
   });
   return token;
-};
-
-export const validateAdmin = async (userId) => {
-  if (!userId) {
-    throw new Error("User ID is required");
-  }
-
-  const { data: userData, error: userError } = await supabase
-    .from("clients")
-    .select("id, email, name, company_name, phonenumber, client_id")
-    .eq("id", userId)
-    .single();
-
-  if (userError || !userData) {
-    throw new Error("User not found");
-  }
-
-  try {
-    const apiResponse = await axios.get(
-      `${apiBaseUrl}:${port}/api/v1/get/clients-data/${userData.id}`,
-      { timeout: 5000 }
-    );
-    return {
-      message: "Authenticated",
-      user: {
-        id: userData.id,
-        email: userData.email,
-        name: userData.name,
-        additionalData: apiResponse.data,
-      },
-    };
-  } catch (apiErr) {
-    console.warn(
-      `Could not fetch additional user data for ID ${userData.id}:`,
-      apiErr.message
-    );
-    return {
-      message: "Authenticated (partial data)",
-      user: {
-        id: userData.id,
-        email: userData.email,
-        name: userData.name,
-        additionalData: null,
-      },
-    };
-  }
 };
