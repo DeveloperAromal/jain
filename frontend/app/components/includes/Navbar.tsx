@@ -23,7 +23,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="px-4 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-4">
+      <header className="px-4 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-4 w-full fixed z-20 bg-white/30 backdrop-blur-3xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="text-xl sm:text-2xl font-bold text-foreground">Jain</div>
 

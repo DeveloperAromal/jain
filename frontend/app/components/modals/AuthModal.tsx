@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAPICall } from "@/app/hooks/useApiCall";
 import { ApiEndPoints } from "@/app/config/Backend";
@@ -16,6 +16,9 @@ export default function AuthModal() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isPassSame, setIsPassSame] = useState(true);
+
   const [name, setName] = useState("");
   const [studentClass, setStudentClass] = useState("");
 
@@ -23,6 +26,12 @@ export default function AuthModal() {
 
   const router = useRouter();
   const { makeApiCall } = useAPICall();
+
+  useEffect(() => {
+    if (confirmPassword.length > 0) {
+      setIsPassSame(password === confirmPassword);
+    }
+  }, [password, confirmPassword]);
 
   const canSubmit =
     email.includes("@") &&
@@ -98,14 +107,13 @@ export default function AuthModal() {
   return (
     <div
       className="
-        p-8
+        
         max-w-md 
         lg:max-w-xl  
         mx-auto
       "
     >
-      {/* Title */}
-      <h1 className="text-2xl font-semibold text-center text-foreground/80 col-span-2">
+      <h1 className="text-3xl font-semibold text-center text-foreground/80 col-span-2">
         {isLogin ? "Welcome Back 👋" : "Create Your Account"}
       </h1>
 
@@ -115,39 +123,22 @@ export default function AuthModal() {
           : "Join Jain and unlock premium learning experience"}
       </p>
 
-      {/* Form Grid */}
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-2">
-        {/* Name (Signup only) */}
+      <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-2">
         {!isLogin && (
-          <div className="space-y-1">
+          <div className="space-y-1 w-full">
             <label className="text-sm font-medium text-foreground/80/80">
               Full Name
             </label>
             <input
               type="text"
               placeholder="eg: John Doe"
-              className="w-full px-4 py-3 border border-border rounded-lg"
+              className="w-full px-4 py-1.5 border border-border rounded-lg"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
         )}
 
-        {/* Email */}
-        <div
-          className={`space-y-1 ${isLogin ? "lg:col-span-2" : "lg:col-span-2"}`}
-        >
-          <label className="text-sm font-medium text-foreground/80">Email</label>
-          <input
-            type="email"
-            placeholder="eg: user@gmail.com"
-            className="w-full px-4 py-3 border border-border rounded-lg"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-
-        {/* Phone (Signup only) */}
         {!isLogin && (
           <div className="space-y-1">
             <label className="text-sm font-medium text-foreground/80">
@@ -156,28 +147,43 @@ export default function AuthModal() {
             <input
               type="tel"
               placeholder="Enter phone number"
-              className="w-full px-4 py-3 border border-border rounded-lg"
+              className="w-full px-4 py-1.5 border border-border rounded-lg"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
         )}
 
-        {/* Class (Signup only) */}
         {!isLogin && (
           <div className="space-y-1">
-            <label className="text-sm font-medium text-foreground/80">Class</label>
+            <label className="text-sm font-medium text-foreground/80">
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="eg: user@gmail.com"
+              className="w-full px-4 py-1.5 border border-border rounded-lg"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+        )}
+
+        {!isLogin && (
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-foreground/80">
+              Class
+            </label>
             <input
               type="text"
               placeholder="eg: 10, 11, 12"
-              className="w-full px-4 py-3 border border-border rounded-lg"
+              className="w-full px-4 py-1.5 border border-border rounded-lg"
               value={studentClass}
               onChange={(e) => setStudentClass(e.target.value)}
             />
           </div>
         )}
 
-        {/* Password */}
         <div className="space-y-1 lg:col-span-2">
           <label className="text-sm font-medium text-foreground/80">
             Password
@@ -185,30 +191,45 @@ export default function AuthModal() {
           <input
             type="password"
             placeholder="Enter your password"
-            className="w-full px-4 py-3 border border-border rounded-lg"
+            className="w-full px-4 py-1.5 border border-border rounded-lg"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
 
-        {/* Button */}
+        <div className="space-y-1 lg:col-span-2">
+          <label className="text-sm font-medium text-foreground/80">
+            Password
+          </label>
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className={`w-full px-4 py-1.5 border p-2 rounded-lg ${
+              !isPassSame ? "border-red-500 " : "border-border"
+            }`}
+          />
+        </div>
+
+        {isPassSame ? (
+          <p className="text-green-500 text-sm">Passwords matchs</p>
+        ) : (
+          <p className="text-red-500 text-sm">Passwords do not match</p>
+        )}
+
         <div className="lg:col-span-2">
           <button
             disabled={!canSubmit}
             onClick={isLogin ? handleLogin : handleSignup}
-            className={`w-full py-3 rounded-lg text-white font-semibold transition-all ${
-              canSubmit
-                ? "bg-primary hover:bg-primary-hover shadow-sm"
-                : "bg-gray-300 cursor-not-allowed"
-            }`}
+            className={`w-full py-3 rounded-lg text-white font-semibold transition-all bg-primary hover:bg-primary-hover shadow-sm`}
           >
-            {loading ? "Please wait..." : isLogin ? "Login" : "Create Account"}
+            Create Account
           </button>
         </div>
       </div>
 
-      {/* Toggle */}
-      <p className="text-center text-sm mt-6 text-foreground/80">
+      <p className="text-center text-sm mt-3 text-foreground/80">
         {isLogin ? (
           <>
             Don’t have an account?{" "}
