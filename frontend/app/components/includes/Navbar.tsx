@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import AuthModal from "../modals/AuthModal";
+import Link from "next/link";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -44,9 +45,9 @@ export default function Navbar() {
           {/* DESKTOP NAV */}
           <nav className="hidden md:flex gap-6 lg:gap-8">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item}
-                href={`#${item.toLowerCase()}`}
+                href={item.toLowerCase() === "home" ? "/" : `/${item.toLowerCase()}`}
                 className="
                   relative text-sm lg:text-base font-medium
                   text-text-secondary hover:text-foreground transition
@@ -57,13 +58,14 @@ export default function Navbar() {
                 "
               >
                 {item}
-              </a>
+              </Link>
             ))}
           </nav>
 
           {/* ACTIONS */}
           <div className="flex items-center gap-3 sm:gap-4">
-            <button
+            <Link
+              href="/login"
               className="
                 hidden sm:block ml-4
                 px-5 py-2.5
@@ -81,7 +83,7 @@ export default function Navbar() {
               onClick={() => setOpen(true)}
             >
               Sign Up
-            </button>
+            </Link>
 
             {/* MOBILE TOGGLE */}
             <button
@@ -106,14 +108,14 @@ export default function Navbar() {
                           rounded-2xl shadow-lg">
             <nav className="flex flex-col gap-4">
               {navItems.map((item) => (
-                <a
+                <Link
                   key={item}
-                  href={`#${item.toLowerCase()}`}
+                  href={item.toLowerCase() === "home" ? "/" : `/${item.toLowerCase()}`}
                   className="text-text-secondary hover:text-foreground transition py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item}
-                </a>
+                </Link>
               ))}
               <button
                 className="
