@@ -15,13 +15,56 @@ export default function Hero() {
               Class 10 students.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start pt-2">
-              <button className="px-6 py-3 border border-border rounded-3xl text-foreground hover:bg-bg-soft transition-colors text-sm sm:text-base">
-                Join Now
+              <button
+                className="
+                  group relative overflow-hidden
+                  px-6 py-3
+                  rounded-3xl
+                  text-sm sm:text-base font-medium
+                  text-foreground
+                  bg-white/60 backdrop-blur-md
+                  border border-black/10
+                  shadow-sm
+                  transition-all duration-300 ease-out
+                  hover:-translate-y-1 hover:shadow-xl
+                "
+              >
+                <span className="relative z-10">Join Now</span>
+                <span
+                  className="
+                    pointer-events-none absolute inset-0
+                    bg-gradient-to-r from-transparent via-white/40 to-transparent
+                    translate-x-[-120%] group-hover:translate-x-[120%]
+                    transition-transform duration-700
+                  "
+                />
               </button>
-              <button className="px-6 py-3 rounded-3xl bg-primary/80 text-white hover:bg-primary transition-colors text-sm sm:text-base">
-                Explore Courses
+
+              <button
+                className="
+                  group relative overflow-hidden
+                  px-6 py-3
+                  rounded-3xl
+                  text-sm sm:text-base font-medium
+                  text-white
+                  bg-primary
+                  shadow-lg shadow-primary/30
+                  transition-all duration-300 ease-out
+                  hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/40
+                "
+              >
+                <span className="relative z-10">Explore Courses</span>
+                <span
+                  className="
+                    pointer-events-none absolute inset-0
+                    bg-gradient-to-r from-transparent via-white/30 to-transparent
+                    translate-x-[-120%] group-hover:translate-x-[120%]
+                    transition-transform duration-700
+                  "
+                />
               </button>
             </div>
+
           </div>
 
           <div className="w-full lg:w-auto flex justify-center pt-16 lg:justify-end">

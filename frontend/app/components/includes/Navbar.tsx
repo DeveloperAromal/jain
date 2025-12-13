@@ -23,32 +23,69 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="px-4 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-4 w-full fixed z-20 bg-white/30 backdrop-blur-3xl">
+      {/* HEADER */}
+      <header
+        className="
+          px-4 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-4
+          w-full fixed top-0 z-20
+          bg-white/60 backdrop-blur-2xl
+          border-b border-black/5
+        "
+        style={{
+          boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
+        }}
+      >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="text-xl sm:text-2xl font-bold text-foreground">Jain</div>
+          {/* LOGO */}
+          <div className="text-xl sm:text-2xl font-bold text-foreground tracking-tight hover:opacity-90 transition">
+            Jain
+          </div>
 
-          <nav className="hidden md:flex gap-6 lg:gap-8 text-text-secondary font-medium">
+          {/* DESKTOP NAV */}
+          <nav className="hidden md:flex gap-6 lg:gap-8">
             {navItems.map((item) => (
               <a
                 key={item}
                 href={`#${item.toLowerCase()}`}
-                className="hover:text-foreground transition text-sm lg:text-base"
+                className="
+                  relative text-sm lg:text-base font-medium
+                  text-text-secondary hover:text-foreground transition
+                  after:absolute after:-bottom-1 after:left-0
+                  after:h-[2px] after:w-0 after:bg-foreground
+                  after:transition-all after:duration-300
+                  hover:after:w-full
+                "
               >
                 {item}
               </a>
             ))}
           </nav>
 
+          {/* ACTIONS */}
           <div className="flex items-center gap-3 sm:gap-4">
             <button
-              className="hidden sm:block ml-4 py-2 px-4 border border-border rounded-2xl text-foreground hover:bg-primary hover:text-white transition text-sm lg:text-base"
+              className="
+                hidden sm:block ml-4
+                px-5 py-2.5
+                rounded-2xl
+                text-sm lg:text-base font-medium
+                text-foreground
+                bg-white/60 backdrop-blur-md
+                border border-black/10
+                shadow-sm
+                hover:bg-primary hover:text-white
+                hover:shadow-md hover:-translate-y-[1px]
+                transition-all duration-300 ease-out
+                active:translate-y-0
+              "
               onClick={() => setOpen(true)}
             >
               Sign Up
             </button>
 
+            {/* MOBILE TOGGLE */}
             <button
-              className="md:hidden p-2 text-foreground hover:bg-bg-soft rounded-lg transition"
+              className="md:hidden p-2 text-foreground hover:bg-black/5 rounded-lg transition"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -61,8 +98,12 @@ export default function Navbar() {
           </div>
         </div>
 
+        {/* MOBILE MENU */}
         {mobileMenuOpen && (
-          <div className="md:hidden mt-4 px-4 pb-4 border-t border-border pt-4">
+          <div className="md:hidden mt-4 px-4 pb-4 pt-4
+                          bg-white/70 backdrop-blur-xl
+                          border-t border-black/5
+                          rounded-2xl shadow-lg">
             <nav className="flex flex-col gap-4">
               {navItems.map((item) => (
                 <a
@@ -75,7 +116,15 @@ export default function Navbar() {
                 </a>
               ))}
               <button
-                className="py-2 px-4 border border-border rounded-2xl text-foreground hover:bg-primary hover:text-white transition text-left w-full sm:w-auto"
+                className="
+                  py-2 px-4
+                  rounded-2xl
+                  text-foreground font-medium
+                  bg-white/60 backdrop-blur-md
+                  border border-black/10
+                  hover:bg-primary hover:text-white
+                  transition
+                "
                 onClick={() => {
                   setOpen(true);
                   setMobileMenuOpen(false);
@@ -88,13 +137,14 @@ export default function Navbar() {
         )}
       </header>
 
+      {/* MODAL */}
       {open && (
-        <div className="fixed inset-0 z-50 flex justify-center items-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setOpen(false)}
           />
-          <div className="relative bg-background p-4 sm:p-6 w-full rounded-3xl max-w-2xl z-10 max-h-[90vh]">
+          <div className="relative bg-background p-4 sm:p-6 w-full max-w-2xl rounded-3xl z-10 max-h-[90vh]">
             <AuthModal />
           </div>
         </div>
