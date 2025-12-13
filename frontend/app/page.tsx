@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import Hero from "./components/Hero";
 import Navbar from "./components/includes/Navbar";
 import { BentoGridThirdDemo } from "./components/Speciality";
+import CallToAction from "./components/CalltoAction";
 
 export default function LandingPage() {
   return (
@@ -43,6 +44,7 @@ export default function LandingPage() {
         <Hero />
         <CourseWeOffer />
         <BentoGridThirdDemo />
+        <CallToAction />
         <Footer />
       </div>
     </main>

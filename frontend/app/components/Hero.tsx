@@ -6,10 +6,10 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
           <div className="space-y-4 sm:space-y-6 max-w-2xl w-full text-center lg:text-left pt-16">
-            <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight font-bold text-foreground">
+            <h3 className="text-4xl text-left md:text-5xl lg:text-6xl md:text-left leading-tight font-bold text-foreground">
               Discover math as it&apos;s simple and concept-first.
             </h3>
-            <p className="text-sm sm:text-base text-neutral-600 max-w-xl mx-auto lg:mx-0">
+            <p className="text-sm sm:text-base text-left md:text-center md:mx-auto lg:mx-0 text-neutral-600 max-w-xl">
               Master mathematics from basics to advanced levels with our
               comprehensive video courses designed for Plus Two, Plus One, and
               Class 10 students.
@@ -67,7 +67,7 @@ export default function Hero() {
 
           </div>
 
-          <div className="w-full lg:w-auto flex justify-center pt-16 lg:justify-end">
+          <div className="hidden md:flex w-full lg:w-auto justify-center pt-16 lg:justify-end">
             <div className="relative w-full max-w-md sm:max-w-lg lg:max-w-none lg:w-[600px] h-auto">
               <Image
                 src="/hero.png"
