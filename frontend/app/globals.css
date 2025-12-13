@@ -1,22 +1,45 @@
 @import "tailwindcss";
 
+/* =========================
+   Core Design Tokens
+   ========================= */
 :root {
+  /* Base */
   --background: #ffffff;
-  --foreground: #1A1A1A;
+  --foreground: #1a1a1a;
 
-  --primary: #FF7A00;
-  --primary-hover: #FF8F33;
+  /* Brand */
+  --primary: #ff7a00;
+  --primary-hover: #ff8f33;
 
-  --bg-soft: #F7F7F7;
-  --text-secondary: #4D4D4D;
+  /* UI Surfaces */
+  --bg-soft: #f7f7f7;
+  --bg-glass: rgba(255, 255, 255, 0.7);
 
-  --border: #E6E6E6;
-  --accent-soft: #FFE7CC;
+  /* Text */
+  --text-secondary: #4d4d4d;
 
+  /* Borders */
+  --border: #e6e6e6;
+  --border-soft: rgba(0, 0, 0, 0.06);
+
+  /* Accents */
+  --accent-soft: #ffe7cc;
+
+  /* Radius */
+  --radius-sm: 12px;
   --radius: 16px;
-  --shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  --radius-lg: 24px;
+
+  /* Shadows (very soft, modern) */
+  --shadow-xs: 0 1px 4px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
+/* =========================
+   Tailwind Theme Mapping
+   ========================= */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -25,24 +48,46 @@
   --color-primary-hover: var(--primary-hover);
 
   --color-bg-soft: var(--bg-soft);
+  --color-bg-glass: var(--bg-glass);
+
   --color-text-secondary: var(--text-secondary);
 
   --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+
   --color-accent-soft: var(--accent-soft);
 
+  --radius-sm: var(--radius-sm);
   --radius: var(--radius);
-  --shadow: var(--shadow);
+  --radius-lg: var(--radius-lg);
+
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+/* =========================
+   Base Styles
+   ========================= */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
+/* =========================
+   Utilities
+   ========================= */
 .no-scroll-bar::-webkit-scrollbar {
   width: 0;
+  height: 0;
+}
+
+.no-scroll-bar {
+  scrollbar-width: none;
 }
