@@ -1,3 +1,5 @@
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
+
 export interface ApiResponse {
   [x: string]: unknown;
   data?: unknown;
