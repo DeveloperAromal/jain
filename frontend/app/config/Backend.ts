@@ -30,4 +30,5 @@ export const ApiEndPoints = {
   ADMIN_DELETE_PROMOCODE: `${baseUrl}/payment/admin/promocodes`,
   UPLOAD_VIDEO: `${baseUrl}/upload/video`,
   UPLOAD_IMAGE: `${baseUrl}/upload/image`,
+  VALIDATE_PROMO: `${baseUrl}/admin/verify-promocodes`,
 };

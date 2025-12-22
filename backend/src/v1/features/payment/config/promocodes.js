@@ -12,7 +12,6 @@ export const PROMO_CODES = [
     active: true,
     expires: "2099-12-31",
   },
-  // Add more promo codes as needed
 ];
 
 export function getPromoDetails(code) {

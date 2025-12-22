@@ -3,7 +3,7 @@ import { createTopic } from "../services/topics.service.js";
 
 export const adminCreateCourse = async (req, res) => {
   try {
-    const { subject, subject_class, description, tags, is_free, price, thumbnail_url } = req.body;
+    const { subject, subject_class, description, tags, cover_image } = req.body;
     const created_by = req.user?.id;
     const instructor_id = req.user?.id;
 
@@ -19,11 +19,7 @@ export const adminCreateCourse = async (req, res) => {
       subject_class,
       description,
       tags,
-      is_free: is_free === true || is_free === "true",
-      price: price || 0,
-      instructor_id,
-      created_by,
-      thumbnail_url,
+      cover_image,
     });
 
     return res.status(201).json({

@@ -95,25 +95,28 @@ export const adminGetAllCourses = async (req, res) => {
   }
 };
 
-
-
 export const create_course = async (req, res) => {
   try {
-    const { subject, student_class, description, tags } = req.body;
+    const { subject, subject_class, description, tags, cover_image } = req.body;
 
-    if (!subject || !student_class) {
-      return res.status(400).json({
-        success: false,
-        message: "subject and student_class are required",
-      });
-    }
-
-    const newCourse = await createCourse(
+    console.log("📥 CREATE COURSE REQUEST BODY");
+    console.log({
       subject,
-      student_class,
+      subject_class,
       description,
-      tags
-    );
+      tags,
+      cover_image,
+      cover_image_type: typeof cover_image,
+      cover_image_length: cover_image?.length,
+    });
+    
+    const newCourse = await createCourse({
+      subject,
+      subject_class,
+      description,
+      tags,
+      cover_image,
+    });
 
     return res.status(201).json({
       success: true,
@@ -124,7 +127,7 @@ export const create_course = async (req, res) => {
     console.error("create_course error:", e);
     return res.status(500).json({
       success: false,
-      message:  `Failed to create course ${e}`,
+      message: `Failed to create course ${e}`,
     });
   }
 };

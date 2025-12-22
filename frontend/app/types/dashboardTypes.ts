@@ -22,6 +22,8 @@ export interface AuthContextType {
 }
 
 export interface Course {
+  cover_image: string | StaticImport;
+  duration_minutes: string;
   id: string | number;
   subject: string;
   subject_class: string;

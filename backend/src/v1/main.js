@@ -31,6 +31,6 @@ app.use("/api/v1", paymentRoutes);
 app.use("/api/v1", courseRoutes);
 app.use("/api/v1", topicRoutes);
 app.use("/api/v1/upload", uploadRoutes);
-app.use("/api/v1/payment", promocodeRoutes);
+app.use("/api/v1", promocodeRoutes);
  
 export default app;

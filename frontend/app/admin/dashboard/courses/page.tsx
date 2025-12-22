@@ -67,8 +67,7 @@ export default function AdminCourses() {
 
       await makeApiCall(
         "DELETE",
-        `${ApiEndPoints.ADMIN_DELETE_COURSE}/${courseId}`,
-        null,
+        `${ApiEndPoints.ADMIN_DELETE_COURSE}/${courseId}`, {},
         "application/json",
         token
       );

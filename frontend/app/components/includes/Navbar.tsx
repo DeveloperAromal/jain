@@ -62,11 +62,8 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* ACTIONS */}
           <div className="flex items-center gap-3 sm:gap-4">
-            <Link
-              href="/login"
-              className="
+            <button           className="
                 hidden sm:block ml-4
                 px-5 py-2.5
                 rounded-2xl
@@ -83,9 +80,8 @@ export default function Navbar() {
               onClick={() => setOpen(true)}
             >
               Sign Up
-            </Link>
+            </button>
 
-            {/* MOBILE TOGGLE */}
             <button
               className="md:hidden p-2 text-foreground hover:bg-black/5 rounded-lg transition"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -100,7 +96,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* MOBILE MENU */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 px-4 pb-4 pt-4
                           bg-white/70 backdrop-blur-xl
@@ -139,7 +134,6 @@ export default function Navbar() {
         )}
       </header>
 
-      {/* MODAL */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div

@@ -1,79 +1,76 @@
 import * as paymentService from "../services/payment.service.js";
 
 export const createOrder = async (req, res) => {
-  try {
-    const { amount, currency = "INR", receipt, promoCode, subscriptionMonths = 12 } = req.body;
-    const userId = req.user?.id;
+  console.debug("[PAYMENT][CREATE_ORDER] Request received");
 
-    if (!amount || typeof amount !== "number" || amount <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Amount must be a positive number",
-      });
+  try {
+    const userId = req.user?.id;
+    const { promoCode } = req.body;
+
+    console.debug("[PAYMENT][CREATE_ORDER] User:", userId);
+    console.debug("[PAYMENT][CREATE_ORDER] Promo:", promoCode || "NONE");
+
+    if (!userId) {
+      console.warn("[PAYMENT][CREATE_ORDER] Unauthorized request");
+      return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    // Subscription payment - no courseId needed (gives access to ALL courses)
-    const result = await paymentService.createOrderService({
-      amount,
-      currency,
-      receipt,
-      promoCode,
+    const result = await paymentService.createSubscriptionOrder({
       userId,
-      courseId: null, // NULL for subscription (all courses access)
-      subscriptionMonths: subscriptionMonths || 12,
+      promoCode,
     });
 
-    return res.status(201).json({
-      success: true,
-      data: result,
-    });
+    console.info(
+      "[PAYMENT][CREATE_ORDER] Razorpay order created:",
+      result?.order?.id
+    );
+
+    return res.status(201).json({ success: true, data: result });
   } catch (error) {
-    console.error("createOrder controller error:", error);
+    console.error("[PAYMENT][CREATE_ORDER] Error:", error);
     return res.status(500).json({
       success: false,
-      message: error.message || "Failed to create payment order",
+      message: error.message || "Failed to create order",
     });
   }
 };
 
 export const verifySignature = async (req, res) => {
-  try {
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-    } = req.body;
-    const userId = req.user?.id;
+  console.debug("[PAYMENT][VERIFY] Verification request received");
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-      return res.status(400).json({
-        success: false,
-        message: "All payment details are required",
-      });
-    }
+  try {
+    const userId = req.user?.id;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+      req.body;
+
+    console.debug("[PAYMENT][VERIFY] User:", userId);
+    console.debug("[PAYMENT][VERIFY] Order:", razorpay_order_id);
 
     if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: "User not authenticated",
-      });
+      console.warn("[PAYMENT][VERIFY] Unauthorized request");
+      return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    const result = await paymentService.verifyPaymentAndEnroll({
+    const result = await paymentService.verifySubscriptionPayment({
+      userId,
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      userId,
     });
+
+    console.info(
+      "[PAYMENT][VERIFY] Subscription activated until:",
+      result.subscription_end_date
+    );
 
     return res.status(200).json({
       success: true,
-      message: "Payment verified and enrollment created",
+      message: "Subscription activated",
       data: result,
     });
   } catch (error) {
-    console.error("verifySignature error:", error);
-    return res.status(500).json({
+    console.error("[PAYMENT][VERIFY] Error:", error);
+    return res.status(400).json({
       success: false,
       message: error.message || "Payment verification failed",
     });

@@ -19,21 +19,21 @@ export default function Sidebar({ isOpen = false, onClose }: { isOpen?: boolean;
       url: "/learn/dashboard/courses",
       icon: <Book size={20} />,
     },
-    {
-      name: "Assignments",
-      url: "/learn/dashboard/assignments",
-      icon: <FileText size={20} />,
-    },
-    {
-      name: "Progress",
-      url: "/learn/dashboard/progress",
-      icon: <LineChart size={20} />,
-    },
-    {
-      name: "Community",
-      url: "/learn/dashboard/community",
-      icon: <Users size={20} />,
-    },
+    // {
+    //   name: "Assignments",
+    //   url: "/learn/dashboard/assignments",
+    //   icon: <FileText size={20} />,
+    // },
+    // {
+    //   name: "Progress",
+    //   url: "/learn/dashboard/progress",
+    //   icon: <LineChart size={20} />,
+    // },
+    // {
+    //   name: "Community",
+    //   url: "/learn/dashboard/community",
+    //   icon: <Users size={20} />,
+    // },
     {
       name: "Settings",
       url: "/learn/dashboard/settings",

@@ -124,6 +124,23 @@ export default function CourseDetails() {
     }
   };
 
+  function getVideoDuration(url: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement("video");
+
+      video.preload = "metadata";
+      video.src = url;
+      video.crossOrigin = "anonymous";
+
+      video.onloadedmetadata = () => {
+        URL.revokeObjectURL(video.src);
+        resolve(video.duration); // seconds
+      };
+
+      video.onerror = () => reject("Failed to load video metadata");
+    });
+  }
+
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -165,11 +182,22 @@ export default function CourseDetails() {
     }
   };
 
+  
+
   const handleTopicSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const token = Cookies.get("admin_token");
       if (!token) return;
+
+      let durationMinutes: number | null = null;
+
+      if (topicFormData.video_url) {
+        const durationSeconds = await getVideoDuration(topicFormData.video_url);
+
+        durationMinutes = Math.ceil(durationSeconds / 60);
+      }
+
 
       await makeApiCall(
         "POST",
@@ -177,8 +205,10 @@ export default function CourseDetails() {
         {
           course_id: courseId,
           ...topicFormData,
-          duration_minutes: topicFormData.duration_minutes ? parseInt(topicFormData.duration_minutes) : null,
-          sequence_order: topicFormData.sequence_order ? parseInt(topicFormData.sequence_order) : null,
+          duration_minutes: durationMinutes,
+          sequence_order: topicFormData.sequence_order
+            ? parseInt(topicFormData.sequence_order)
+            : null,
         },
         "application/json",
         token
@@ -231,11 +261,15 @@ export default function CourseDetails() {
         Back to Courses
       </Link>
 
-      <div className="bg-white rounded-xl border border-border p-6 sm:p-8 mb-6">
+      <div className="bg-white rounded-xl border border-neutral-900 p-6 sm:p-8 mb-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{course.subject}</h1>
-            <p className="text-sm sm:text-base text-text-secondary">Class {course.subject_class}</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+              {course.subject}
+            </h1>
+            <p className="text-sm sm:text-base text-text-secondary">
+              Class {course.subject_class}
+            </p>
           </div>
           <button
             onClick={() => setShowTopicForm(!showTopicForm)}
@@ -247,22 +281,29 @@ export default function CourseDetails() {
         </div>
 
         {course.description && (
-          <p className="text-sm sm:text-base text-text-secondary mb-4">{course.description}</p>
+          <p className="text-sm sm:text-base text-text-secondary mb-4">
+            {course.description}
+          </p>
         )}
 
         <div className="flex items-center gap-4 text-sm">
-          <span className={`px-3 py-1 rounded-full ${course.is_free ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
+          <span
+            className={`px-3 py-1 rounded-full ${
+              course.is_free
+                ? "bg-green-100 text-green-700"
+                : "bg-orange-100 text-orange-700"
+            }`}
+          >
             {course.is_free ? "Free" : "Paid"}
           </span>
-          {!course.is_free && course.price && (
-            <span className="text-foreground font-medium">₹{course.price}</span>
-          )}
         </div>
       </div>
 
       {showTopicForm && (
-        <div className="bg-white rounded-xl border border-border p-6 sm:p-8 mb-6">
-          <h2 className="text-xl font-bold text-foreground mb-6">Add New Topic</h2>
+        <div className="bg-white rounded-xl border border-neutral-900 p-6 sm:p-8 mb-6">
+          <h2 className="text-xl font-bold text-foreground mb-6">
+            Add New Topic
+          </h2>
           <form onSubmit={handleTopicSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
@@ -271,9 +312,11 @@ export default function CourseDetails() {
               <input
                 type="text"
                 value={topicFormData.title}
-                onChange={(e) => setTopicFormData({ ...topicFormData, title: e.target.value })}
+                onChange={(e) =>
+                  setTopicFormData({ ...topicFormData, title: e.target.value })
+                }
                 required
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-4 py-3 border border-neutral-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="e.g., Introduction to Algebra"
               />
             </div>
@@ -284,9 +327,14 @@ export default function CourseDetails() {
               </label>
               <textarea
                 value={topicFormData.description}
-                onChange={(e) => setTopicFormData({ ...topicFormData, description: e.target.value })}
+                onChange={(e) =>
+                  setTopicFormData({
+                    ...topicFormData,
+                    description: e.target.value,
+                  })
+                }
                 rows={3}
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                className="w-full px-4 py-3 border border-neutral-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 placeholder="Topic description..."
               />
             </div>
@@ -296,10 +344,14 @@ export default function CourseDetails() {
                 <label className="block text-sm font-medium text-foreground mb-2">
                   Video Upload
                 </label>
-                <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-bg-soft transition-colors">
+                <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-neutral-900 rounded-lg cursor-pointer hover:bg-bg-soft transition-colors">
                   <Upload className="w-5 h-5 text-text-secondary" />
                   <span className="text-sm text-text-secondary">
-                    {uploadingVideo ? "Uploading..." : videoFile ? videoFile.name : "Upload Video"}
+                    {uploadingVideo
+                      ? "Uploading..."
+                      : videoFile
+                      ? videoFile.name
+                      : "Upload Video"}
                   </span>
                   <input
                     type="file"
@@ -310,7 +362,9 @@ export default function CourseDetails() {
                   />
                 </label>
                 {topicFormData.video_url && (
-                  <p className="text-xs text-green-600 mt-2">Video uploaded successfully</p>
+                  <p className="text-xs text-green-600 mt-2">
+                    Video uploaded successfully
+                  </p>
                 )}
               </div>
 
@@ -318,10 +372,14 @@ export default function CourseDetails() {
                 <label className="block text-sm font-medium text-foreground mb-2">
                   Thumbnail Image
                 </label>
-                <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-bg-soft transition-colors">
+                <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-neutral-900 rounded-lg cursor-pointer hover:bg-bg-soft transition-colors">
                   <Upload className="w-5 h-5 text-text-secondary" />
                   <span className="text-sm text-text-secondary">
-                    {uploadingThumbnail ? "Uploading..." : thumbnailFile ? thumbnailFile.name : "Upload Thumbnail"}
+                    {uploadingThumbnail
+                      ? "Uploading..."
+                      : thumbnailFile
+                      ? thumbnailFile.name
+                      : "Upload Thumbnail"}
                   </span>
                   <input
                     type="file"
@@ -332,7 +390,9 @@ export default function CourseDetails() {
                   />
                 </label>
                 {topicFormData.thumbnail_img && (
-                  <p className="text-xs text-green-600 mt-2">Thumbnail uploaded successfully</p>
+                  <p className="text-xs text-green-600 mt-2">
+                    Thumbnail uploaded successfully
+                  </p>
                 )}
               </div>
             </div>
@@ -340,47 +400,39 @@ export default function CourseDetails() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Duration (minutes)
-                </label>
-                <input
-                  type="number"
-                  value={topicFormData.duration_minutes}
-                  onChange={(e) => setTopicFormData({ ...topicFormData, duration_minutes: e.target.value })}
-                  min="0"
-                  className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="0"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
                   Sequence Order
                 </label>
                 <input
                   type="number"
                   value={topicFormData.sequence_order}
-                  onChange={(e) => setTopicFormData({ ...topicFormData, sequence_order: e.target.value })}
+                  onChange={(e) =>
+                    setTopicFormData({
+                      ...topicFormData,
+                      sequence_order: e.target.value,
+                    })
+                  }
                   min="1"
-                  className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-4 py-3 border border-neutral-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="Auto"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Tags (comma separated)
+                </label>
+                <input
+                  type="text"
+                  value={topicFormData.tags}
+                  onChange={(e) =>
+                    setTopicFormData({ ...topicFormData, tags: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-neutral-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="algebra, equations, variables"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Tags (comma separated)
-              </label>
-              <input
-                type="text"
-                value={topicFormData.tags}
-                onChange={(e) => setTopicFormData({ ...topicFormData, tags: e.target.value })}
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="algebra, equations, variables"
-              />
-            </div>
-
-            <div className="flex items-center gap-4 pt-4 border-t border-border">
+            <div className="flex items-center gap-4 pt-4 border-t border-neutral-900">
               <button
                 type="submit"
                 disabled={uploadingVideo || uploadingThumbnail}
@@ -409,7 +461,7 @@ export default function CourseDetails() {
                     sequence_order: "",
                   });
                 }}
-                className="px-6 py-3 border border-border rounded-lg hover:bg-bg-soft transition-colors text-foreground"
+                className="px-6 py-3 border border-neutral-900 rounded-lg hover:bg-bg-soft transition-colors text-foreground"
               >
                 Cancel
               </button>
@@ -418,35 +470,45 @@ export default function CourseDetails() {
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-border p-6 sm:p-8">
-        <h2 className="text-xl font-bold text-foreground mb-6">Topics ({topics.length})</h2>
+      <div className="bg-white rounded-xl border border-neutral-900 p-6 sm:p-8">
+        <h2 className="text-xl font-bold text-foreground mb-6">
+          {(topics.length <= 1) ? "Topic" : "Topics" } ({topics.length})
+        </h2>
         {topics.length === 0 ? (
-          <p className="text-text-secondary text-center py-8">No topics yet. Add your first topic above.</p>
+          <p className="text-text-secondary text-center py-8">
+            No topics yet. Add your first topic above.
+          </p>
         ) : (
           <div className="space-y-4">
             {topics.map((topic, index) => (
-              <div key={topic.id} className="flex items-start gap-4 p-4 border border-border rounded-lg hover:bg-bg-soft transition-colors">
-                {topic.thumbnail_img && (
-                  <div className="relative w-24 h-16 sm:w-32 sm:h-20 rounded-lg overflow-hidden flex-shrink-0">
-                    <Image
-                      src={topic.thumbnail_img}
-                      alt={topic.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )}
+              <div
+                key={topic.id}
+                className="flex items-center gap-4 p-4 border border-neutral-900 rounded-lg hover:bg-bg-soft transition-colors"
+              >
+                  {topic.thumbnail_img && (
+                    <div className="relative w-24 h-16 sm:w-32 sm:h-20 rounded-lg overflow-hidden">
+                      <Image
+                        src={topic.thumbnail_img}
+                        alt={topic.title}
+                        fill
+                      />
+                    </div>
+                  )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-semibold text-text-secondary bg-bg-soft px-2 py-1 rounded">
+                        <h2 className="font-semibold text-text-secondary bg-bg-soft px-2 py-1 rounded">
                           {index + 1}
-                        </span>
-                        <h3 className="font-semibold text-foreground">{topic.title}</h3>
+                        </h2>
+                        <h3 className="font-semibold text-foreground">
+                          {topic.title}
+                        </h3>
                       </div>
                       {topic.description && (
-                        <p className="text-sm text-text-secondary line-clamp-2">{topic.description}</p>
+                        <p className="text-sm text-text-secondary line-clamp-2">
+                          {topic.description}
+                        </p>
                       )}
                     </div>
                   </div>

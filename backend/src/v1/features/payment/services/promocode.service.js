@@ -1,13 +1,18 @@
 import { supabase } from "../../../config/supabase.config.js";
 
+/**
+ * Create promo code
+ */
 export async function createPromoCode({
   code,
   discount_percent,
   max_uses = -1,
-  expires,
-  description,
-  created_by,
+  expires = null,
+  description = null,
+  created_by = null,
 }) {
+  console.debug("[PROMO][SERVICE][CREATE]", code);
+
   if (!code || !discount_percent) {
     throw new Error("Code and discount_percent are required");
   }
@@ -25,38 +30,43 @@ export async function createPromoCode({
         max_uses,
         used_count: 0,
         active: true,
-        expires: expires || null,
-        description: description || null,
-        created_by: created_by || null,
+        expires,
+        description,
+        created_by,
       },
     ])
-    .select("*");
+    .select()
+    .single();
 
   if (error) {
+    console.error("[PROMO][SERVICE][CREATE] Error:", error);
     if (error.code === "23505") {
       throw new Error("Promo code already exists");
     }
-    throw new Error(error.message);
+    throw error;
   }
 
-  return data[0];
+  return data;
 }
 
+/**
+ * Get all promo codes
+ */
 export async function getAllPromoCodes() {
   const { data, error } = await supabase
     .from("promocodes")
     .select("*")
     .order("created_at", { ascending: false });
 
-  if (error) throw new Error(error.message);
-
-  return data || [];
+  if (error) throw error;
+  return data;
 }
 
+/**
+ * Update promo code
+ */
 export async function updatePromoCode(id, updates) {
-  if (!id) {
-    throw new Error("Promo code ID is required");
-  }
+  console.debug("[PROMO][SERVICE][UPDATE]", id);
 
   const { data, error } = await supabase
     .from("promocodes")
@@ -65,25 +75,83 @@ export async function updatePromoCode(id, updates) {
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
-    .select("*");
+    .select()
+    .single();
 
-  if (error) throw new Error(error.message);
-
-  return data[0];
+  if (error) throw error;
+  return data;
 }
 
+/**
+ * Delete promo code
+ */
 export async function deletePromoCode(id) {
-  if (!id) {
-    throw new Error("Promo code ID is required");
+  console.debug("[PROMO][SERVICE][DELETE]", id);
+
+  const { error } = await supabase.from("promocodes").delete().eq("id", id);
+
+  if (error) throw error;
+  return true;
+}
+
+
+export async function verifyPromoCode({ code, baseAmount = 0 }) {
+  console.debug("[PROMO][SERVICE][VERIFY]", code);
+
+  const normalizedCode = code.toUpperCase();
+
+  const { data: promo, error } = await supabase
+    .from("promocodes")
+    .select("*")
+    .eq("code", normalizedCode)
+    .eq("active", true)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[PROMO][SERVICE][VERIFY] Supabase error:", error);
+    throw new Error(error.message);
   }
 
-  const { error } = await supabase
-    .from("promocodes")
-    .delete()
-    .eq("id", id);
+  if (!promo) {
+    return {
+      valid: false,
+      message: "Invalid promo code",
+      discountAmount: 0,
+      finalAmount: baseAmount,
+    };
+  }
 
-  if (error) throw new Error(error.message);
+  if (promo.expires && new Date(promo.expires) < new Date()) {
+    return {
+      valid: false,
+      message: "Promo code expired",
+      discountAmount: 0,
+      finalAmount: baseAmount,
+    };
+  }
 
-  return { success: true };
+  if (promo.max_uses !== -1 && promo.used_count >= promo.max_uses) {
+    return {
+      valid: false,
+      message: "Promo code usage limit reached",
+      discountAmount: 0,
+      finalAmount: baseAmount,
+    };
+  }
+
+  const discountAmount = Math.round((baseAmount * promo.discount_percent) / 100);
+  const finalAmount = Math.max(baseAmount - discountAmount, 0);
+
+  console.info(
+    "[PROMO][SERVICE][VERIFY] Promo applied:",
+    promo.code,
+    "Discount:", discountAmount
+  );
+
+  return {
+    valid: true,
+    message: "Promo applied successfully",
+    discountAmount,
+    finalAmount,
+  };
 }
-

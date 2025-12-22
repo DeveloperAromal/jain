@@ -1,8 +1,14 @@
 import { supabase } from "../../../config/supabase.config.js";
 
-export async function createCourse(subject, student_class, description, tags) {
-  if (!subject || !student_class) {
-    throw new Error("Subject and student_class are required");
+export async function createCourse({
+  subject,
+  subject_class,
+  description,
+  tags,
+  cover_image,
+}) {
+  if (!subject || !subject_class) {
+    throw new Error("Subject and subject_class are required");
   }
 
   const { data, error } = await supabase
@@ -10,18 +16,19 @@ export async function createCourse(subject, student_class, description, tags) {
     .insert([
       {
         subject,
-        subject_class: student_class,
+        subject_class,
         description,
         tags,
+        cover_image,
         is_free: false,
       },
     ])
     .select("*");
 
-  if (error) throw new Error(error.message);
-
-  return data;
+  if (error) throw error;
+  return data[0];
 }
+
 
 export async function getAllCourse() {
   const { data, error } = await supabase

@@ -20,9 +20,7 @@ export default function About(){
       </p>
     </div>
 
-    {/* Courses Grid */}
     <div className="grid gap-6 sm:grid-cols-2">
-      {/* Course Card */}
       {[
         {
           title: "Plus Two Mathematics",

@@ -1,48 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAPICall } from "@/app/hooks/useApiCall";
 import { ApiEndPoints } from "@/app/config/Backend";
-import {
-  Crown,
-  CheckCircle2,
-  Loader2,
-} from "lucide-react";
+import { useAuth } from "@/app/hooks/useAuth";
+
+import { Crown, CheckCircle2, Loader2, XCircle } from "lucide-react";
 import Image from "next/image";
 import Cookies from "js-cookie";
 import { PromoCode, RazorpayResponse } from "@/app/types/dashboardTypes";
 
 declare global {
   interface Window {
-    Razorpay: {
-      new (options: RazorpayOptions): RazorpayInstance;
-    };
+    Razorpay: any;
   }
-}
-
-interface RazorpayOptions {
-  key: string;
-  amount: number;
-  currency: string;
-  name: string;
-  description: string;
-  order_id: string;
-  handler: (response: RazorpayResponse) => void | Promise<void>;
-  prefill: {
-    name: string;
-    email: string;
-  };
-  theme: {
-    color: string;
-  };
-  modal: {
-    ondismiss: () => void;
-  };
-}
-
-interface RazorpayInstance {
-  open: () => void;
 }
 
 interface OrderResponse {
@@ -50,25 +24,27 @@ interface OrderResponse {
     id: string;
     amount: number;
     currency: string;
-    status: string;
   };
   finalAmount: number;
   appliedPromo?: PromoCode;
 }
 
 export default function PaymentPage() {
+  const auth = useAuth();
+  const { user } = auth;
+
   const router = useRouter();
   const { makeApiCall } = useAPICall();
 
-  // loading state not displayed; kept for potential future UI toggles
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [loading, setLoading] = useState(false);
-  const [processing, setProcessing] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+  const [orderData, setOrderData] = useState<OrderResponse | null>(null);
   const [error, setError] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const [validatingPromo, setValidatingPromo] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [subscriptionPrice] = useState(999);
+
+  const originalPrice = 999;
 
   useEffect(() => {
     if (typeof window !== "undefined" && !window.Razorpay) {
@@ -79,100 +55,140 @@ export default function PaymentPage() {
     }
   }, []);
 
-  const handlePayment = async () => {
+  const applyPromoCode = async () => {
+    if (!promoCode.trim()) return;
+    setValidatingPromo(true);
+    setError("");
+
     try {
-      setProcessing(true);
-      setError("");
-
       const token = Cookies.get("token");
-      if (!token) {
-        setError("Authentication required");
-        setProcessing(false);
-        return;
-      }
-
-      const orderResponse = await makeApiCall(
+      const res = await makeApiCall(
         "POST",
-        ApiEndPoints.CREATE_PAYMENT_ORDER,
-        {
-          amount: subscriptionPrice,
-          subscriptionMonths: 12,
-          promoCode: promoCode || undefined,
-        },
+        ApiEndPoints.VALIDATE_PROMO,
+        { code: promoCode },
         "application/json",
         token
       );
 
-      const orderData = (orderResponse?.data?.data || orderResponse?.data || orderResponse || {}) as OrderResponse;
-      const { order, finalAmount, appliedPromo: promo } = orderData;
-
-      if (!order?.id) {
-        throw new Error("Failed to create payment order. Please try again.");
+      if (res?.data?.valid) {
+        setAppliedPromo(res.data.promo);
+      } else {
+        setError(res?.data?.message || "Invalid promo code");
+        setAppliedPromo(null);
       }
-
-      if (promo) setAppliedPromo(promo);
-
-      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
-      if (!razorpayKey) throw new Error("Razorpay key not configured.");
-
-      const options: RazorpayOptions = {
-        key: razorpayKey,
-        amount: finalAmount * 100,
-        currency: "INR",
-        name: "Jain Math Hub",
-        description: "12 Months Premium Subscription",
-        order_id: order.id,
-        handler: async function (response: RazorpayResponse) {
-          try {
-            const token = Cookies.get("token");
-            if (!token) {
-              setError("Authentication required");
-              setProcessing(false);
-              return;
-            }
-
-            const verifyResponse = await makeApiCall(
-              "POST",
-              ApiEndPoints.VERIFY_PAYMENT,
-              {
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-              },
-              "application/json",
-              token
-            );
-
-            if (verifyResponse?.success || verifyResponse?.data?.success) {
-              setPaymentSuccess(true);
-              setTimeout(() => router.push("/learn/dashboard/courses"), 2000);
-            } else {
-              setError("Payment verification failed");
-            }
-          } catch (err) {
-            console.error(err);
-            setError("Payment verification failed. Please contact support.");
-          } finally {
-            setProcessing(false);
-          }
-        },
-        prefill: {
-          name: "Student",
-          email: "student@example.com",
-        },
-        theme: { color: "#4F46E5" },
-        modal: {
-          ondismiss: () => setProcessing(false),
-        },
-      };
-
-      new window.Razorpay(options).open();
     } catch (err) {
-      console.error(err);
-      setError("Failed to initiate payment");
-      setProcessing(false);
+      setError("Failed to validate promo code");
+      setAppliedPromo(null);
+    } finally {
+      setValidatingPromo(false);
     }
   };
+
+const createOrder = async (): Promise<OrderResponse | null> => {
+  setProcessing(true);
+  setError("");
+
+  try {
+    const token = Cookies.get("token");
+    if (!token) {
+      setError("Please log in to continue");
+      return null;
+    }
+
+    const userId = user?.id;
+    if (!userId) {
+      setError("User information not found. Please log in again.");
+      return null;
+    }
+
+    const res = await makeApiCall(
+      "POST",
+      ApiEndPoints.CREATE_PAYMENT_ORDER,
+      {
+        promoCode: appliedPromo ? promoCode : undefined,
+        userId,
+      },
+      "application/json",
+      token
+    );
+
+    const data = (res?.data?.data || res?.data || res) as OrderResponse;
+
+    setOrderData(data);
+
+    return data;
+  } catch (err) {
+    setError("Failed to create order. Please try again.");
+    return null;
+  } finally {
+    setProcessing(false);
+  }
+};
+
+
+  const handlePayment = async () => {
+    setError("");
+
+    const order = orderData ?? (await createOrder());
+    if (!order) return;
+
+    setProcessing(true);
+
+    const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    if (!razorpayKey) {
+      setError("Payment gateway not configured");
+      setProcessing(false);
+      return;
+    }
+
+    const options = {
+      key: razorpayKey,
+      amount: order.finalAmount * 100,
+      currency: "INR",
+      name: "Jain Math Hub",
+      description: "12 Months Premium Subscription",
+      order_id: order.order.id,
+
+      handler: async (response: RazorpayResponse) => {
+        try {
+          const token = Cookies.get("token");
+          const verifyRes = await makeApiCall(
+            "POST",
+            ApiEndPoints.VERIFY_PAYMENT,
+            {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            },
+            "application/json",
+            token
+          );
+
+          if (verifyRes?.success || verifyRes?.data?.success) {
+            setPaymentSuccess(true);
+            setTimeout(() => router.push("/learn/dashboard/courses"), 2000);
+          } else {
+            setError("Payment verification failed");
+          }
+        } catch {
+          setError("Payment failed. Please contact support.");
+        } finally {
+          setProcessing(false);
+        }
+      },
+
+      prefill: {
+        name: user?.name,
+        email: user?.email,
+      },
+
+      theme: { color: "#4F46E5" },
+      modal: { ondismiss: () => setProcessing(false) },
+    };
+
+    new window.Razorpay(options).open();
+  };
+
 
   if (paymentSuccess) {
     return (
@@ -190,11 +206,14 @@ export default function PaymentPage() {
     );
   }
 
-  const originalPrice = subscriptionPrice;
-  const discount = appliedPromo
-    ? Math.round((originalPrice * appliedPromo.discountPercent) / 100)
-    : 0;
-  const finalPrice = originalPrice - discount;
+const finalPrice = appliedPromo
+  ? Math.max(
+      originalPrice -
+        Math.round((appliedPromo.discountPercent / 100) * originalPrice),
+      0
+    )
+  : originalPrice;
+  const discount = originalPrice - finalPrice;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -214,11 +233,12 @@ export default function PaymentPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        {/* Left: Benefits */}
         <div className="bg-white rounded-xl border border-border p-6">
           <div className="relative mb-4">
             <Image
               src="/thumb.png"
-              alt="Subscription"
+              alt="Premium Subscription"
               width={400}
               height={250}
               className="w-full h-48 object-cover rounded-lg"
@@ -245,21 +265,24 @@ export default function PaymentPage() {
                 key={i}
                 className="flex items-center gap-2 text-sm text-text-secondary"
               >
-                <CheckCircle2 className="w-4 h-4 text-green-500" /> {item}
+                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                {item}
               </div>
             ))}
           </div>
 
-          <div className="pt-4 border-t border-border flex items-center gap-2 text-sm text-text-secondary">
+          <div className="pt-4 border-t border-border text-sm text-text-secondary">
             Valid for 12 months from payment date
           </div>
         </div>
 
+        {/* Right: Payment Details */}
         <div className="bg-white rounded-xl border border-border p-6">
           <h3 className="text-lg font-bold text-foreground mb-4">
             Payment Details
           </h3>
 
+          {/* Promo Code Input */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-foreground mb-2">
               Promo Code (Optional)
@@ -271,27 +294,45 @@ export default function PaymentPage() {
                 onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                 placeholder="Enter promo code"
                 className="flex-1 px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                disabled={processing || !!appliedPromo}
+                disabled={processing || validatingPromo || !!appliedPromo}
               />
-              {!appliedPromo && (
+              {!appliedPromo ? (
                 <button
-                  onClick={() => setError("")}
-                  className="px-4 py-2 bg-bg-soft text-foreground rounded-lg hover:bg-border transition-colors"
-                  disabled={processing}
+                  onClick={applyPromoCode}
+                  disabled={validatingPromo || !promoCode.trim() || processing}
+                  className="px-4 py-2 bg-bg-soft text-foreground rounded-lg hover:bg-border transition-colors disabled:opacity-50"
                 >
-                  Apply
+                  {validatingPromo ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    "Apply"
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setAppliedPromo(null);
+                    setPromoCode("");
+                    setOrderData(null);
+                    setError("");
+                  }}
+                  className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors flex items-center gap-1"
+                >
+                  <XCircle className="w-4 h-4" /> Remove
                 </button>
               )}
             </div>
+
             {appliedPromo && (
               <div className="mt-2 text-sm text-green-600 flex items-center gap-1">
-                <CheckCircle2 className="w-4 h-4" /> Promo code{" "}
-                {appliedPromo.code} applied ({appliedPromo.discountPercent}%
-                off)
+                <CheckCircle2 className="w-4 h-4" />
+                Promo code {appliedPromo.code} applied (
+                {appliedPromo.discountPercent}% off)
               </div>
             )}
           </div>
 
+          {/* Price Breakdown */}
           <div className="space-y-3 mb-6 pb-6 border-b border-border">
             <div className="flex justify-between text-sm">
               <span className="text-text-secondary">
@@ -311,12 +352,14 @@ export default function PaymentPage() {
             </div>
           </div>
 
+          {/* Error Message */}
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
               {error}
             </div>
           )}
 
+          {/* Pay Button */}
           <button
             onClick={handlePayment}
             disabled={processing}
@@ -324,12 +367,13 @@ export default function PaymentPage() {
           >
             {processing ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" /> Processing...
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Processing...
               </>
             ) : (
               <>
-                <Crown className="w-5 h-5" /> Pay ₹{finalPrice} for 12 Months
-                Access
+                <Crown className="w-5 h-5" />
+                Pay ₹{finalPrice} for 12 Months Access
               </>
             )}
           </button>
