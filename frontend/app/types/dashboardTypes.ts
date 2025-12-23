@@ -15,12 +15,14 @@ export interface User {
   role: string;
   company_name: string;
   client_id: string;
+  subscription_active: boolean;
 }
 
 export interface AuthContextType {
   user: User | null;
   login: (userData: User, token: string) => void;
   logout: () => void;
+  loading: boolean;
 }
 
 export interface Course {
@@ -54,6 +56,7 @@ export interface Topic {
   sequence_order?: number;
   created_at?: string;
   updated_at?: string;
+  is_free: boolean;
 }
 
 export interface SubscriptionStatus {
