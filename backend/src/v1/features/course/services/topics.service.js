@@ -39,7 +39,7 @@ export async function createTopic({
         duration_minutes,
         sequence_order,
         is_published: true,
-        is_free: !!is_free,
+        is_free: is_free === true,
       },
     ])
     .select("*");
@@ -96,4 +96,33 @@ export async function getAuthorizedTopic(user_id, course_id) {
     ...topic,
     is_unlocked: topic.is_free || subscription_active,
   }));
+}
+
+
+
+export async function toggleTopicFreeService(topicId) {
+  const { data: topic, error: fetchError } = await supabase
+    .from("topics")
+    .select("id, is_free")
+    .eq("id", topicId)
+    .single();
+
+  if (fetchError || !topic) {
+    throw new Error("Topic not found");
+  }
+
+  const newValue = topic.is_free === true ? false : true;
+
+  const { data, error: updateError } = await supabase
+    .from("topics")
+    .update({ is_free: newValue })
+    .eq("id", topicId)
+    .select("*")
+    .single();
+
+  if (updateError) {
+    throw updateError;
+  }
+
+  return data;
 }

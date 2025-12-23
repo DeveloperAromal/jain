@@ -3,6 +3,7 @@ import {
   getTopicsByCourseID,
   togleTopicFree,
   getAuthorizedTopic,
+  toggleTopicFreeService,
 } from "../services/topics.service.js";
 
 export const create_topic = async (req, res) => {
@@ -102,6 +103,34 @@ export const getAuthorizedTopicsHandler = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: `Failed to fetch: ${e.message || e}`,
+    });
+  }
+};
+
+
+export const toggleTopicFreeStatus = async (req, res) => {
+  try {
+    const { topicId } = req.params;
+
+    if (!topicId) {
+      return res.status(400).json({
+        success: false,
+        message: "Topic ID is required",
+      });
+    }
+
+    const updatedTopic = await toggleTopicFreeService(topicId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Topic free status updated successfully",
+      topic: updatedTopic,
+    });
+  } catch (error) {
+    console.error("[TOPIC][TOGGLE_FREE] Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to update topic status",
     });
   }
 };

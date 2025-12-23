@@ -33,6 +33,8 @@ export const ApiEndPoints = {
   GET_ALL_STATUS: `${baseUrl}/admin/status`,
   GET_ALL_STUDENTS: `${baseUrl}/admin/all_students`,
 
+  PATCH_TOGGLE_FREE_TOPIC: (topic_id: string) =>
+    `${baseUrl}/topics/${topic_id}/toggle-free`,
   GET_EACH_MONTH_REVENUE: (month: string) =>
     `${baseUrl}/admin/monthly_revenue/${month}`,
 

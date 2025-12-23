@@ -45,6 +45,7 @@ export interface Course {
 }
 
 export interface Topic {
+  is_unlocked: any;
   id: string;
   course_id: string;
   title: string;

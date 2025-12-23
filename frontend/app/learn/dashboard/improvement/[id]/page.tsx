@@ -64,23 +64,18 @@ export default function CoursePage() {
       setCourse(courseData);
       setTopics(topicData);
 
-      if (topicData.length > 0) {
-        const firstPlayable = topicData.find(
-          (t: Topic) => t.is_free || user.subscription_active
-        );
-        if (firstPlayable) setSelectedTopic(firstPlayable);
-      }
+      // ✅ pick first unlocked topic ONLY
+      const firstPlayable = topicData.find((t: Topic) => t.is_unlocked);
+      if (firstPlayable) setSelectedTopic(firstPlayable);
     } catch (e) {
       console.error("Error fetching topics:", e);
     } finally {
       setLoading(false);
     }
-  }, [courseId, user?.id, user?.subscription_active, makeApiCall]);
+  }, [courseId, user?.id, makeApiCall]);
 
   useEffect(() => {
-    if (!authLoading) {
-      getTopics();
-    }
+    if (!authLoading) getTopics();
   }, [authLoading, getTopics]);
 
   useEffect(() => {
@@ -94,17 +89,16 @@ export default function CoursePage() {
 
       const currentIndex = topics.findIndex((t) => t.id === selectedTopic.id);
       const nextTopic = topics[currentIndex + 1];
-      const canPlayNext =
-        nextTopic && (nextTopic.is_free || user?.subscription_active);
 
-      if (canPlayNext) {
+      // ✅ only auto-play unlocked topic
+      if (nextTopic?.is_unlocked) {
         setTimeout(() => setSelectedTopic(nextTopic), 2000);
       }
     };
 
     videoEl.addEventListener("ended", handleEnded);
     return () => videoEl.removeEventListener("ended", handleEnded);
-  }, [selectedTopic, topics, user?.subscription_active]);
+  }, [selectedTopic, topics]);
 
   const isTopicCompleted = (topicId: string) => completedTopics.has(topicId);
 
@@ -121,15 +115,15 @@ export default function CoursePage() {
 
   return (
     <section className="w-full flex flex-col lg:flex-row lg:h-[calc(100vh-64px)] bg-background">
-      {/* Left: player + details (like YouTube watch page) */}
+      {/* Player */}
       <div className="lg:w-2/3 w-full border-b lg:border-b-0 lg:border-r border-border flex flex-col">
         <div className="w-full bg-black">
           <div className="max-w-5xl mx-auto">
-            {selectedTopic && user?.id ? (
+            {selectedTopic?.is_unlocked ? (
               <video
                 key={selectedTopic.id}
                 ref={videoRef}
-                src={ApiEndPoints.GET_STREAM(user.id, selectedTopic.id)}
+                src={ApiEndPoints.GET_STREAM(user!.id, selectedTopic.id)}
                 controls
                 autoPlay
                 className="w-full aspect-video bg-black"
@@ -161,7 +155,7 @@ export default function CoursePage() {
         </div>
       </div>
 
-      {/* Right: topics list as "Up next" column */}
+      {/* Topic list */}
       <aside className="lg:w-1/3 w-full bg-card flex flex-col">
         <div className="px-4 py-3 border-b border-border">
           <h3 className="font-semibold text-sm sm:text-base">Course Topics</h3>
@@ -174,7 +168,7 @@ export default function CoursePage() {
           {topics.map((topic, index) => {
             const isSelected = selectedTopic?.id === topic.id;
             const isCompleted = isTopicCompleted(topic.id);
-            const canWatch = topic.is_free || user?.subscription_active;
+            const canWatch = topic.is_unlocked;
 
             return (
               <div
@@ -193,7 +187,6 @@ export default function CoursePage() {
                   }
                 `}
               >
-                {/* Thumbnail like right column of YouTube */}
                 <div className="relative shrink-0">
                   <Image
                     src={topic.thumbnail_img || "/placeholder.png"}
@@ -212,7 +205,6 @@ export default function CoursePage() {
                   )}
                 </div>
 
-                {/* Text meta */}
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium text-xs sm:text-sm line-clamp-2">
                     {index + 1}. {topic.title}

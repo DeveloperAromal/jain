@@ -64,23 +64,18 @@ export default function CoursePage() {
       setCourse(courseData);
       setTopics(topicData);
 
-      if (topicData.length > 0) {
-        const firstPlayable = topicData.find(
-          (t: Topic) => t.is_free || user.subscription_active
-        );
-        if (firstPlayable) setSelectedTopic(firstPlayable);
-      }
+      // ✅ pick first unlocked topic
+      const firstPlayable = topicData.find((t: Topic) => t.is_unlocked);
+      if (firstPlayable) setSelectedTopic(firstPlayable);
     } catch (e) {
       console.error("Error fetching topics:", e);
     } finally {
       setLoading(false);
     }
-  }, [courseId, user?.id, user?.subscription_active, makeApiCall]);
+  }, [courseId, user?.id, makeApiCall]);
 
   useEffect(() => {
-    if (!authLoading) {
-      getTopics();
-    }
+    if (!authLoading) getTopics();
   }, [authLoading, getTopics]);
 
   useEffect(() => {
@@ -94,17 +89,15 @@ export default function CoursePage() {
 
       const currentIndex = topics.findIndex((t) => t.id === selectedTopic.id);
       const nextTopic = topics[currentIndex + 1];
-      const canPlayNext =
-        nextTopic && (nextTopic.is_free || user?.subscription_active);
 
-      if (canPlayNext) {
+      if (nextTopic?.is_unlocked) {
         setTimeout(() => setSelectedTopic(nextTopic), 2000);
       }
     };
 
     videoEl.addEventListener("ended", handleEnded);
     return () => videoEl.removeEventListener("ended", handleEnded);
-  }, [selectedTopic, topics, user?.subscription_active]);
+  }, [selectedTopic, topics]);
 
   const isTopicCompleted = (topicId: string) => completedTopics.has(topicId);
 
@@ -121,14 +114,15 @@ export default function CoursePage() {
 
   return (
     <section className="w-full flex flex-col lg:flex-row lg:h-[calc(100vh-64px)] bg-background">
+      {/* Player */}
       <div className="lg:w-2/3 w-full border-b lg:border-b-0 lg:border-r border-border flex flex-col">
         <div className="w-full bg-black">
           <div className="max-w-5xl mx-auto">
-            {selectedTopic && user?.id ? (
+            {selectedTopic?.is_unlocked ? (
               <video
                 key={selectedTopic.id}
                 ref={videoRef}
-                src={ApiEndPoints.GET_STREAM(user.id, selectedTopic.id)}
+                src={ApiEndPoints.GET_STREAM(user!.id, selectedTopic.id)}
                 controls
                 autoPlay
                 className="w-full aspect-video bg-black"
@@ -142,29 +136,27 @@ export default function CoursePage() {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
-            <h2 className="text-lg sm:text-2xl font-semibold mb-2">
+          <div className="max-w-5xl mx-auto px-4 py-6">
+            <h2 className="text-xl font-semibold mb-2">
               {selectedTopic?.title || "Select a topic"}
             </h2>
             {selectedTopic && (
-              <div className="flex items-center gap-3 text-xs sm:text-sm text-muted-foreground mb-4">
+              <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
                 <Clock className="w-4 h-4" />
                 <span>{selectedTopic.duration_minutes} mins</span>
               </div>
             )}
-            <p className="text-sm sm:text-base text-muted-foreground">
-              {selectedTopic?.description ||
-                "Choose a lesson from the list on the right."}
+            <p className="text-muted-foreground">
+              {selectedTopic?.description}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Right: topics list as "Up next" column */}
       <aside className="lg:w-1/3 w-full bg-card flex flex-col">
         <div className="px-4 py-3 border-b border-border">
-          <h3 className="font-semibold text-sm sm:text-base">Course Topics</h3>
-          <p className="text-[11px] sm:text-xs text-muted-foreground">
+          <h3 className="font-semibold">Course Topics</h3>
+          <p className="text-xs text-muted-foreground">
             {topics.length} lessons
           </p>
         </div>
@@ -173,33 +165,28 @@ export default function CoursePage() {
           {topics.map((topic, index) => {
             const isSelected = selectedTopic?.id === topic.id;
             const isCompleted = isTopicCompleted(topic.id);
-            const canWatch = topic.is_free || user?.subscription_active;
+            const canWatch = topic.is_unlocked;
 
             return (
               <div
                 key={topic.id}
                 onClick={() => canWatch && setSelectedTopic(topic)}
-                className={`relative flex gap-3 p-2.5 rounded-xl transition
+                className={`flex gap-3 p-2.5 rounded-xl transition
                   ${
                     canWatch
                       ? "cursor-pointer hover:bg-accent/40"
                       : "opacity-60 cursor-not-allowed"
                   }
-                  ${
-                    isSelected
-                      ? "bg-accent border border-primary/40"
-                      : "border border-transparent"
-                  }
+                  ${isSelected ? "bg-accent border border-primary/40" : ""}
                 `}
               >
-                {/* Thumbnail like right column of YouTube */}
                 <div className="relative shrink-0">
                   <Image
-                    src={topic.thumbnail_img || "/placeholder.png"}
+                    src={topic.thumbnail_img || " "}
                     alt={topic.title}
                     width={150}
                     height={84}
-                    className="rounded-lg object-cover w-32 h-[72px] sm:w-36 sm:h-20"
+                    className="rounded-lg object-cover w-32 h-[72px]"
                   />
                   {!canWatch && (
                     <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center">
@@ -211,22 +198,18 @@ export default function CoursePage() {
                   )}
                 </div>
 
-                {/* Text meta */}
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-xs sm:text-sm line-clamp-2">
+                  <h4 className="font-medium text-sm line-clamp-2">
                     {index + 1}. {topic.title}
                   </h4>
-                  <p className="text-[11px] sm:text-xs text-muted-foreground line-clamp-2 mt-0.5">
-                    {topic.description}
-                  </p>
-                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-1">
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                     <Clock className="w-3 h-3" />
                     <span>{topic.duration_minutes} mins</span>
                   </div>
                 </div>
 
                 {isSelected && canWatch && (
-                  <Play className="w-4 h-4 text-primary mt-1 hidden sm:block" />
+                  <Play className="w-4 h-4 text-primary mt-1" />
                 )}
               </div>
             );

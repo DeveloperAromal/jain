@@ -5,7 +5,14 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useAPICall } from "@/app/hooks/useApiCall";
 import { ApiEndPoints } from "@/app/config/Backend";
-import { ArrowLeft, Plus, Upload, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Plus,
+  Upload,
+  Loader2,
+  ToggleRight,
+  ToggleLeft,
+} from "lucide-react";
 import Link from "next/link";
 import Cookies from "js-cookie";
 import { Course, Topic } from "@/app/types/dashboardTypes";
@@ -28,12 +35,13 @@ export default function CourseDetails() {
     thumbnail_img: "",
     duration_minutes: "",
     sequence_order: "",
-    is_free: false, // added field
+    is_free: false,
   });
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [togglingTopic, setTogglingTopic] = useState<string | null>(null); // Track which topic is being toggled
 
   const fetchCourse = useCallback(async () => {
     try {
@@ -80,6 +88,31 @@ export default function CourseDetails() {
     }
   }, [courseId, makeApiCall]);
 
+  // New toggle topic function
+  const handleToggleTopicFree = async (topicId: string) => {
+    try {
+      setTogglingTopic(topicId);
+      const token = Cookies.get("admin_token");
+      if (!token) return;
+
+      await makeApiCall(
+        "PATCH",
+        ApiEndPoints.PATCH_TOGGLE_FREE_TOPIC(topicId),
+        {},
+        "application/json",
+        token
+      );
+
+      // Refresh topics list
+      await fetchTopics();
+    } catch (error: any) {
+      console.error("Error toggling topic:", error);
+      alert(error?.response?.data?.message || "Failed to toggle topic status");
+    } finally {
+      setTogglingTopic(null);
+    }
+  };
+
   useEffect(() => {
     if (courseId) {
       fetchCourse();
@@ -87,6 +120,7 @@ export default function CourseDetails() {
     }
   }, [courseId, fetchCourse, fetchTopics]);
 
+  // ... (keep all existing upload handlers and submit handler unchanged)
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -138,7 +172,7 @@ export default function CourseDetails() {
 
       video.onloadedmetadata = () => {
         URL.revokeObjectURL(video.src);
-        resolve(video.duration); // seconds
+        resolve(video.duration);
       };
 
       video.onerror = () => reject("Failed to load video metadata");
@@ -218,7 +252,7 @@ export default function CourseDetails() {
           sequence_order: topicFormData.sequence_order
             ? parseInt(topicFormData.sequence_order)
             : null,
-          is_free: !!topicFormData.is_free, 
+          is_free: !!topicFormData.is_free,
         },
         "application/json",
         token
@@ -313,12 +347,15 @@ export default function CourseDetails() {
         </div>
       </div>
 
+      {/* Keep the existing topic form unchanged */}
       {showTopicForm && (
         <div className="bg-white rounded-xl border border-neutral-900 p-6 sm:p-8 mb-6">
+          {/* ... existing form content unchanged ... */}
           <h2 className="text-xl font-bold text-foreground mb-6">
             Add New Topic
           </h2>
           <form onSubmit={handleTopicSubmit} className="space-y-6">
+            {/* ... all existing form fields unchanged ... */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Topic Title *
@@ -446,7 +483,6 @@ export default function CourseDetails() {
               </div>
             </div>
 
-            {/* New is_free checkbox */}
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -517,21 +553,21 @@ export default function CourseDetails() {
             {topics.map((topic, index) => (
               <div
                 key={topic.id}
-                className="flex items-center gap-4 p-4 border border-neutral-900 rounded-lg hover:bg-bg-soft transition-colors"
+                className="flex items-start gap-4 p-4 border border-neutral-900 rounded-lg hover:bg-bg-soft transition-colors"
               >
                 {topic.thumbnail_img && (
-                  <div className="relative w-24 h-16 sm:w-32 sm:h-20 rounded-lg overflow-hidden">
+                  <div className="relative w-24 h-16 sm:w-32 sm:h-20 rounded-lg overflow-hidden flex-shrink-0">
                     <Image src={topic.thumbnail_img} alt={topic.title} fill />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-4 mb-2">
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h2 className="font-semibold text-text-secondary bg-bg-soft px-2 py-1 rounded">
                           {index + 1}
                         </h2>
-                        <h3 className="font-semibold text-foreground">
+                        <h3 className="font-semibold text-foreground truncate">
                           {topic.title}
                         </h3>
                       </div>
@@ -541,6 +577,33 @@ export default function CourseDetails() {
                         </p>
                       )}
                     </div>
+                    {/* Toggle Button */}
+                    {topic.is_free !== undefined && (
+                      <button
+                        onClick={() => handleToggleTopicFree(topic.id)}
+                        disabled={togglingTopic === topic.id}
+                        className="flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors border border-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={`Toggle ${topic.is_free ? "Paid" : "Free"}`}
+                      >
+                        {togglingTopic === topic.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : topic.is_free ? (
+                          <>
+                            <ToggleRight className="w-4 h-4 text-green-600" />
+                            <span className="text-xs font-medium text-green-700">
+                              Free
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <ToggleLeft className="w-4 h-4 text-orange-600" />
+                            <span className="text-xs font-medium text-orange-700">
+                              Paid
+                            </span>
+                          </>
+                        )}
+                      </button>
+                    )}
                   </div>
                   <div className="flex items-center gap-4 text-xs text-text-secondary">
                     {topic.duration_minutes && (
@@ -548,17 +611,6 @@ export default function CourseDetails() {
                     )}
                     {topic.video_url && (
                       <span className="text-green-600">Video uploaded</span>
-                    )}
-                    {topic.is_free !== undefined && (
-                      <span
-                        className={`px-1 rounded ${
-                          topic.is_free
-                            ? "bg-green-100 text-green-700"
-                            : "bg-orange-100 text-orange-700"
-                        }`}
-                      >
-                        {topic.is_free ? "Free" : "Paid"}
-                      </span>
                     )}
                   </div>
                 </div>

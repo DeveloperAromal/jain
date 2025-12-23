@@ -203,7 +203,7 @@ export default function AdminDashboard() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link
-              href="/admin/courses/new"
+              href="/admin/dashboard/courses/new"
               className="group flex items-center gap-4 p-6 border border-border rounded-xl hover:shadow-lg hover:border-primary/50 transition-all"
             >
               <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-all">
