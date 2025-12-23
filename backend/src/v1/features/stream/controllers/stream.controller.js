@@ -2,13 +2,14 @@ import { streamAuthorizeVideoService } from "../services/stream.service.js";
 import { streamVideo } from "../utils/stream.utils.js";
 
 export async function streamAuthorizedVideo(req, res) {
+  console.log("🔥 STREAM CONTROLLER HIT — NO AUTH 🔥");
+
   try {
     const { user_id, topic_id } = req.params;
     const range = req.headers.range;
 
     console.log("Streaming topic:", topic_id);
 
-    // ✅ Authorization handled inside service now
     const videoUrl = await streamAuthorizeVideoService(user_id, topic_id);
 
     await streamVideo({
