@@ -18,3 +18,14 @@ export const Protect = (req, res, next) => {
       .json({ success: false, error: "Invalid or expired token" });
   }
 };
+
+
+export const authorizeAdmin = (req, res, next) => {
+  if (req.user?.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Admin access only",
+    });
+  }
+  next();
+};

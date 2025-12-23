@@ -1,5 +1,5 @@
 import express from "express";
-import { Protect } from "../../auth/middleware/auth.middleware.js";
+import { Protect, authorizeAdmin } from "../../auth/middleware/auth.middleware.js";
 import {
   createPromoCode,
   getAllPromoCodes,
@@ -10,11 +10,14 @@ import {
 
 const router = express.Router();
 
-router.post("/admin/promocodes", Protect, createPromoCode);
-router.get("/admin/promocodes", Protect, getAllPromoCodes);
-router.put("/admin/promocodes/:id", Protect, updatePromoCode);
-router.delete("/admin/promocodes/:id", Protect, deletePromoCode);
-router.post("/admin/verify-promocodes", Protect, validatePromoCode);
+router.use("/admin", Protect, authorizeAdmin);
+
+router.post("/admin/promocodes", createPromoCode);
+router.get("/admin/promocodes", getAllPromoCodes);
+router.put("/admin/promocodes/:id", updatePromoCode);
+router.delete("/admin/promocodes/:id", deletePromoCode);
+router.post("/admin/verify-promocodes", validatePromoCode);
+
 
 
 export default router;

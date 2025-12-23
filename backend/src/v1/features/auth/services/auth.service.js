@@ -1,10 +1,6 @@
-import axios from "axios";
 import { supabase } from "../../../config/supabase.config.js";
 import { generateJwtToken } from "../utils/jwt.js";
 import bcrypt from "bcrypt";
-
-const apiBaseUrl = process.env.API_BASE_URL || "http://localhost";
-const port = process.env.PORT || 4000;
 
 export const signInAdmin = async ({ email, password }) => {
   if (!email || !password) {
@@ -13,7 +9,7 @@ export const signInAdmin = async ({ email, password }) => {
 
   const { data: userData, error: userError } = await supabase
     .from("admin")
-    .select("*")
+    .select("id, email, password") 
     .eq("email", email)
     .single();
 
@@ -22,7 +18,6 @@ export const signInAdmin = async ({ email, password }) => {
   }
 
   const isValid = await bcrypt.compare(password, userData.password);
-
   if (!isValid) {
     throw new Error("Invalid credentials");
   }
@@ -30,6 +25,8 @@ export const signInAdmin = async ({ email, password }) => {
   const token = generateJwtToken({
     id: userData.id,
     email: userData.email,
+    role: "admin", 
   });
+
   return token;
 };
