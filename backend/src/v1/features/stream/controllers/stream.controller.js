@@ -7,7 +7,8 @@ export async function streamAuthorizedVideo(req, res) {
     const { user_id, topic_id } = req.params;
     const range = req.headers.range;
 
-    const token = req.cookies?.token;
+    const token = req.cookies?.token; 
+
     if (!token) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -27,6 +28,7 @@ export async function streamAuthorizedVideo(req, res) {
       range,
       res,
     });
+
   } catch (err) {
     if (err.message === "Invalid or expired token") {
       return res.status(401).json({ message: "Invalid token" });

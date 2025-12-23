@@ -88,7 +88,6 @@ export default function CourseDetails() {
     }
   }, [courseId, makeApiCall]);
 
-  // New toggle topic function
   const handleToggleTopicFree = async (topicId: string) => {
     try {
       setTogglingTopic(topicId);
