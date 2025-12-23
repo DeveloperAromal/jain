@@ -47,23 +47,25 @@ export default function CoursePage() {
 
       const courseData = response?.data?.course || response?.data?.data?.course;
 
-      const topicData =
+      const topicData: Topic[] =
         response?.data?.topics || response?.data?.data?.topics || [];
 
       setCourse(courseData);
       setTopics(topicData);
 
-      // ✅ Auto-select first FREE topic
-      const firstFreeTopic = topicData.find((t: Topic) => t.is_free);
-      if (firstFreeTopic) {
-        setSelectedTopic(firstFreeTopic);
+      const firstPlayable = topicData.find(
+        (t) => t.is_free || user.subscription_active
+      );
+
+      if (firstPlayable) {
+        setSelectedTopic(firstPlayable);
       }
     } catch (e) {
       console.error("Error fetching topics:", e);
     } finally {
       setLoading(false);
     }
-  }, [courseId, user?.id, makeApiCall]);
+  }, [courseId, user, makeApiCall]);
 
   useEffect(() => {
     if (!authLoading) {
@@ -83,15 +85,17 @@ export default function CoursePage() {
       const currentIndex = topics.findIndex((t) => t.id === selectedTopic.id);
 
       const nextTopic = topics[currentIndex + 1];
+      const canPlayNext =
+        nextTopic && (nextTopic.is_free || user?.subscription_active);
 
-      if (nextTopic && nextTopic.is_free) {
+      if (canPlayNext) {
         setTimeout(() => setSelectedTopic(nextTopic), 2000);
       }
     };
 
     videoEl.addEventListener("ended", handleEnded);
     return () => videoEl.removeEventListener("ended", handleEnded);
-  }, [selectedTopic, topics]);
+  }, [selectedTopic, topics, user?.subscription_active]);
 
   const isTopicCompleted = (topicId: string) => completedTopics.has(topicId);
 
@@ -118,7 +122,7 @@ export default function CoursePage() {
               <video
                 key={selectedTopic.id}
                 ref={videoRef}
-                src={selectedTopic.video_url}
+                src={ApiEndPoints.GET_STREAM(user?.id,selectedTopic.id)}
                 controls
                 autoPlay
                 className="w-full aspect-video bg-black"
@@ -144,7 +148,7 @@ export default function CoursePage() {
 
             <p className="text-text-secondary">
               {selectedTopic?.description ||
-                "Choose a free lesson from the right panel."}
+                "Choose a lesson from the right panel."}
             </p>
           </div>
         </div>
@@ -161,13 +165,14 @@ export default function CoursePage() {
           {topics.map((topic, index) => {
             const isSelected = selectedTopic?.id === topic.id;
             const isCompleted = isTopicCompleted(topic.id);
+            const canWatch = topic.is_free || user?.subscription_active;
 
             return (
               <div
                 key={topic.id}
-                onClick={() => topic.is_free && setSelectedTopic(topic)}
+                onClick={() => canWatch && setSelectedTopic(topic)}
                 className={`relative flex gap-3 p-3 rounded-xl border transition ${
-                  topic.is_free
+                  canWatch
                     ? "cursor-pointer hover:bg-bg-soft"
                     : "opacity-60 cursor-not-allowed"
                 } ${
@@ -185,7 +190,7 @@ export default function CoursePage() {
                     className="rounded-lg object-cover w-28 h-16"
                   />
 
-                  {!topic.is_free && (
+                  {!canWatch && (
                     <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center">
                       <Lock className="w-5 h-5 text-white" />
                     </div>
@@ -209,7 +214,7 @@ export default function CoursePage() {
                   </div>
                 </div>
 
-                {isSelected && topic.is_free && (
+                {isSelected && canWatch && (
                   <Play className="w-4 h-4 text-primary mt-1" />
                 )}
               </div>

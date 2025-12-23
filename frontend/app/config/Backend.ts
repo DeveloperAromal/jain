@@ -34,4 +34,6 @@ export const ApiEndPoints = {
   GET_COURSE_LIST: (user_id: string) => `${baseUrl}/course/list/${user_id}`,
   GET_TOPICS_LIST: (user_id: string, course_id: string) =>
     `${baseUrl}/course/topics/${user_id}/${course_id}`,
+  GET_STREAM: (user_id: string, topic_id: string) =>
+    `${baseUrl}/topics/${user_id}/video/${topic_id}/stream`,
 };

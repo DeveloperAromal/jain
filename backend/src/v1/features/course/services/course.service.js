@@ -96,7 +96,6 @@ export async function getCoursesForUnpaidStudent() {
 
   return data || [];
 }
-
 export async function getUserSubscriptionStatus(userId) {
   if (!userId) {
     throw new Error("User ID is required");
@@ -104,7 +103,14 @@ export async function getUserSubscriptionStatus(userId) {
 
   const { data: user, error: userError } = await supabase
     .from("users")
-    .select("created_at, subscription_active, subscription_end_date")
+    .select(
+      `
+        created_at,
+        subscription_active,
+        subscription_start_date,
+        subscription_end_date
+      `
+    )
     .eq("id", userId)
     .single();
 
@@ -112,33 +118,50 @@ export async function getUserSubscriptionStatus(userId) {
     throw new Error("User not found");
   }
 
-  const createdAt = new Date(user.created_at);
   const now = new Date();
-  const daysSinceSignup = Math.floor((now - createdAt) / (1000 * 60 * 60 * 24));
-  const isFreeTrialActive = daysSinceSignup < 7;
-  const daysRemaining = Math.max(0, 7 - daysSinceSignup);
 
+  /* ---------------------------------- */
+  /* Free Trial Logic                    */
+  /* ---------------------------------- */
+  const createdAt = new Date(user.created_at);
+  const daysSinceSignup = Math.floor(
+    (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  const isFreeTrialActive = daysSinceSignup < 7;
+  const freeTrialDaysRemaining = Math.max(0, 7 - daysSinceSignup);
+
+  /* ---------------------------------- */
+  /* Paid Subscription Logic            */
+  /* ---------------------------------- */
   let hasPaidSubscription = false;
   let subscriptionEndDate = null;
   let subscriptionDaysRemaining = 0;
 
   if (user.subscription_active && user.subscription_end_date) {
-    subscriptionEndDate = new Date(user.subscription_end_date);
-    hasPaidSubscription = subscriptionEndDate > now;
+    const endDate = new Date(user.subscription_end_date);
 
-    if (hasPaidSubscription) {
-      const daysUntilExpiry = Math.floor(
-        (subscriptionEndDate - now) / (1000 * 60 * 60 * 24)
+    if (endDate.getTime() > now.getTime()) {
+      hasPaidSubscription = true;
+      subscriptionEndDate = endDate;
+
+      subscriptionDaysRemaining = Math.max(
+        0,
+        Math.floor((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
       );
-      subscriptionDaysRemaining = Math.max(0, daysUntilExpiry);
     } else {
+      // Subscription expired → cleanup
       await supabase
         .from("users")
         .update({ subscription_active: false })
         .eq("id", userId);
     }
-  } else {
-    // Check for paid orders to activate subscription
+  }
+
+  /* ---------------------------------- */
+  /* Fallback: Check Orders Table        */
+  /* ---------------------------------- */
+  if (!hasPaidSubscription) {
     const { data: paidOrders } = await supabase
       .from("orders")
       .select("subscription_end_date")
@@ -147,45 +170,51 @@ export async function getUserSubscriptionStatus(userId) {
       .order("created_at", { ascending: false })
       .limit(1);
 
-    if (
-      paidOrders &&
-      paidOrders.length > 0 &&
-      paidOrders[0].subscription_end_date
-    ) {
-      subscriptionEndDate = new Date(paidOrders[0].subscription_end_date);
-      hasPaidSubscription = subscriptionEndDate > now;
+    if (paidOrders && paidOrders.length > 0) {
+      const endDate = new Date(paidOrders[0].subscription_end_date);
 
-      if (hasPaidSubscription) {
-        const daysUntilExpiry = Math.floor(
-          (subscriptionEndDate - now) / (1000 * 60 * 60 * 24)
+      if (endDate.getTime() > now.getTime()) {
+        hasPaidSubscription = true;
+        subscriptionEndDate = endDate;
+
+        subscriptionDaysRemaining = Math.max(
+          0,
+          Math.floor(
+            (endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+          )
         );
-        subscriptionDaysRemaining = Math.max(0, daysUntilExpiry);
 
-        // Update user subscription status
+        // Sync user table
         await supabase
           .from("users")
           .update({
             subscription_active: true,
             subscription_start_date: new Date(
-              paidOrders[0].subscription_end_date.getTime() -
-                365 * 24 * 60 * 60 * 1000
-            ),
-            subscription_end_date: subscriptionEndDate,
+              endDate.getTime() - 365 * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            subscription_end_date: endDate.toISOString(),
           })
           .eq("id", userId);
       }
     }
   }
 
+  /* ---------------------------------- */
+  /* Final Response                     */
+  /* ---------------------------------- */
   return {
-    // isFreeTrialActive: isFreeTrialActive && !hasPaidSubscription,
-    // daysRemaining,
     hasPaidSubscription,
+    subscriptionType: hasPaidSubscription
+      ? "paid"
+      : isFreeTrialActive
+      ? "trial"
+      : "expired",
     subscriptionEndDate: subscriptionEndDate
       ? subscriptionEndDate.toISOString()
       : null,
     subscriptionDaysRemaining,
-    subscriptionType: hasPaidSubscription ? "paid" : "pending",
+    isFreeTrialActive: isFreeTrialActive && !hasPaidSubscription,
+    freeTrialDaysRemaining,
   };
 }
 
