@@ -7,7 +7,7 @@ export default function Greetings() {
 
   if (!auth || !auth.user) {
     return (
-      <div className="h-screen flex justify-center items-center text-[var(--text-secondary)]">
+      <div className="h-screen flex justify-center items-center text-text-secondary">
         <div className="animate-pulse text-sm sm:text-base">Loading...</div>
       </div>
     );
@@ -17,7 +17,7 @@ export default function Greetings() {
 
   return (
     <div className="mb-6 sm:mb-8">
-      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-6 sm:p-8 md:p-10 bg-gradient-to-br from-[var(--primary)] to-[var(--primary-hover)] text-white shadow-lg">
+      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl p-6 sm:p-8 md:p-10 bg-linear-to-br from-primary to-primary-hover text-white shadow-lg">
         <div className="absolute -top-12 sm:-top-16 -right-12 sm:-right-16 w-32 h-32 sm:w-48 sm:h-48 rounded-full opacity-10 bg-white"></div>
         <div className="absolute -bottom-8 sm:-bottom-12 -left-8 sm:-left-12 w-28 h-28 sm:w-40 sm:h-40 rounded-full opacity-10 bg-white"></div>
         <div className="relative z-10">

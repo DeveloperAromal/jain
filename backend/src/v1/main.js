@@ -15,6 +15,8 @@ import { swaggerSpec } from "./config/swagger.config.js";
 
 import streamRoute from "./features/stream/routes/stream.route.js" 
 
+import statusRoute from "./features/admin/routes/status.route.js"
+import revenueRoute from "./features/admin/routes/revenue.route.js";
 
 
 const app = express();
@@ -41,6 +43,8 @@ app.use("/api/v1", topicRoutes);
 app.use("/api/v1/upload", uploadRoutes);
 app.use("/api/v1", promocodeRoutes);
 app.use("/api/v1", streamRoute);
+app.use("/api/v1", statusRoute);
+app.use("/api/v1", revenueRoute)
 
  
 export default app;

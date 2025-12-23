@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { X, LogOut } from "lucide-react";
-import { Book, LayoutDashboard, Settings } from "lucide-react";
+import { X, LogOut, Book, LayoutDashboard, Settings } from "lucide-react";
 import { useAuth } from "@/app/hooks/useAuth";
 
 export default function Sidebar({
@@ -15,31 +14,40 @@ export default function Sidebar({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logout } = useAuth(); 
+  const { logout, user } = useAuth();
 
   const tabs = [
     {
       name: "Dashboard",
       url: "/learn/dashboard",
-      icon: <LayoutDashboard size={20} />,
+      icon: <LayoutDashboard size={18} />,
     },
     {
       name: "Courses",
       url: "/learn/dashboard/courses",
-      icon: <Book size={20} />,
+      icon: <Book size={18} />,
     },
+    ...(user?.class === "12"
+      ? [
+          {
+            name: "Improvement Classes",
+            url: "/learn/dashboard/improvement",
+            icon: <Book size={18} />,
+          },
+        ]
+      : []),
     {
       name: "Settings",
       url: "/learn/dashboard/settings",
-      icon: <Settings size={20} />,
+      icon: <Settings size={18} />,
     },
   ];
 
   const handleLogout = async () => {
     try {
-      await logout(); 
+      await logout();
       onClose?.();
-      router.push("/"); 
+      router.push("/");
     } catch (err) {
       console.error("Logout failed:", err);
     }
@@ -50,26 +58,27 @@ export default function Sidebar({
       <aside
         className={`
           fixed md:static inset-y-0 left-0 z-40
-          w-72 bg-white border-r border-border
+          w-60 bg-card border-r border-border
           flex flex-col
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
       >
         {/* Mobile header */}
-        <div className="flex items-center justify-between p-4 border-b border-border md:hidden">
-          <h2 className="text-lg font-semibold text-foreground">Menu</h2>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border md:hidden">
+          <h2 className="text-sm font-semibold text-foreground">Menu</h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-bg-soft transition-colors"
+            className="p-1.5 rounded-full hover:bg-accent transition-colors"
             aria-label="Close menu"
           >
-            <X className="w-5 h-5 text-text-secondary" />
+            <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 flex flex-col gap-2 p-4 overflow-y-auto">
+
+        {/* Nav items */}
+        <nav className="flex-1 flex flex-col gap-1 px-2 py-3 overflow-y-auto text-sm">
           {tabs.map((item) => {
             const active = pathname === item.url;
 
@@ -79,38 +88,33 @@ export default function Sidebar({
                 href={item.url}
                 onClick={onClose}
                 className={`
-                  group flex items-center gap-3 px-3 sm:px-4 py-3 rounded-xl transition-all duration-200
+                  flex items-center gap-3 px-3 py-2 rounded-xl
+                  transition-colors
                   ${
                     active
-                      ? "bg-accent-soft text-primary font-semibold shadow-sm"
-                      : "text-text-secondary hover:bg-bg-soft hover:text-foreground"
+                      ? "bg-accent text-foreground font-medium"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
                   }
                 `}
               >
-                <span
-                  className={`transition-transform ${
-                    active ? "scale-110" : "group-hover:scale-105"
-                  }`}
-                >
+                <span className="flex items-center justify-center w-8">
                   {item.icon}
                 </span>
-                <span className="whitespace-nowrap text-sm">{item.name}</span>
+                <span className="truncate">{item.name}</span>
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-4">
+        <div className="px-2 pb-3 pt-1 border-t border-border">
           <button
             onClick={handleLogout}
-            className="
-              w-full flex items-center gap-3 px-4 py-5 rounded-xl
-              text-sm font-medium text-red-600
-              hover:bg-red-50 transition
-            "
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
           >
-            <LogOut size={20} />
-            Logout
+            <span className="flex items-center justify-center w-8">
+              <LogOut size={18} />
+            </span>
+            <span className="truncate">Logout</span>
           </button>
         </div>
       </aside>

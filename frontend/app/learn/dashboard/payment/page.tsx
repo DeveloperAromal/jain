@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { useAPICall } from "@/app/hooks/useApiCall";
 import { ApiEndPoints } from "@/app/config/Backend";
 import { useAuth } from "@/app/hooks/useAuth";
-
 import { Crown, CheckCircle2, Loader2, XCircle } from "lucide-react";
 import Image from "next/image";
 import Cookies from "js-cookie";
@@ -113,7 +112,6 @@ export default function PaymentPage() {
       );
 
       const data = (res?.data?.data || res?.data || res) as OrderResponse;
-
       setOrderData(data);
 
       return data;
@@ -147,7 +145,6 @@ export default function PaymentPage() {
       name: "Jain Math Hub",
       description: "12 Months Premium Subscription",
       order_id: order.order.id,
-
       handler: async (response: RazorpayResponse) => {
         try {
           const token = Cookies.get("token");
@@ -158,6 +155,7 @@ export default function PaymentPage() {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
+              userId: user?.id
             },
             "application/json",
             token
@@ -175,12 +173,10 @@ export default function PaymentPage() {
           setProcessing(false);
         }
       },
-
       prefill: {
         name: user?.name,
         email: user?.email,
       },
-
       theme: { color: "#4F46E5" },
       modal: { ondismiss: () => setProcessing(false) },
     };
@@ -190,13 +186,13 @@ export default function PaymentPage() {
 
   if (paymentSuccess) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="bg-white rounded-2xl border border-green-200 p-8 text-center">
-          <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="bg-card rounded-2xl border border-emerald-200/70 p-8 text-center">
+          <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-foreground mb-2">
             Payment Successful!
           </h2>
-          <p className="text-text-secondary mb-6">
+          <p className="text-sm text-muted-foreground">
             You now have 12 months access to all premium courses. Redirecting...
           </p>
         </div>
@@ -214,170 +210,209 @@ export default function PaymentPage() {
   const discount = originalPrice - finalPrice;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-      <div className="mb-6">
-        <button
-          onClick={() => router.back()}
-          className="text-text-secondary hover:text-foreground mb-4"
-        >
-          ← Back
-        </button>
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
-          Premium Subscription
-        </h1>
-        <p className="text-sm sm:text-base text-text-secondary">
-          Get 12 months access to all premium courses
-        </p>
-      </div>
+    <div className="bg-background">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-        {/* Left: Benefits */}
-        <div className="bg-white rounded-xl border border-border p-6">
-          <div className="relative mb-4">
-            <Image
-              src="/thumb.png"
-              alt="Premium Subscription"
-              width={400}
-              height={250}
-              className="w-full h-48 object-cover rounded-lg"
-            />
-            <div className="absolute top-4 right-4">
-              <span className="px-3 py-1 rounded-full bg-linear-to-r from-orange-500 to-red-500 backdrop-blur-sm text-xs font-semibold text-white flex items-center gap-1">
-                <Crown className="w-3 h-3" /> Premium
-              </span>
-            </div>
+        <div className="mb-6 sm:mb-6">
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 mb-2">
+            <Crown className="w-4 h-4 text-primary" />
+            <span className="text-xs font-medium text-primary">
+              Jain Math Hub Premium
+            </span>
           </div>
-
-          <h2 className="text-lg sm:text-xl font-bold text-foreground mb-3 sm:mb-4">
-            12 Months Premium Access
-          </h2>
-
-          <div className="space-y-3 mb-4">
-            {[
-              "Access to ALL premium courses",
-              "12 months unlimited access",
-              "All course materials and videos",
-              "Progress tracking",
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-2 text-sm text-text-secondary"
-              >
-                <CheckCircle2 className="w-4 h-4 text-green-500" />
-                {item}
-              </div>
-            ))}
-          </div>
-
-          <div className="pt-4 border-t border-border text-sm text-text-secondary">
-            Valid for 12 months from payment date
-          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+            12 months of ad‑free learning
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
+            Watch all premium courses without limits, just like a YouTube
+            Premium experience for your studies.
+          </p>
         </div>
 
-        <div className="bg-white rounded-xl border border-border p-6">
-          <h3 className="text-lg font-bold text-foreground mb-4">
-            Payment Details
-          </h3>
+        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-5">
+            <div className="md:col-span-3 border-b md:border-b-0 md:border-r border-border">
+              <div className="p-4 sm:p-6">
+                <div className="relative rounded-xl overflow-hidden mb-4">
+                  <Image
+                    src="/thumb.png"
+                    alt="Premium Subscription"
+                    width={640}
+                    height={360}
+                    className="w-full aspect-video object-cover"
+                  />
+                  <div className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-black/70 px-3 py-1">
+                    <Crown className="w-4 h-4 text-amber-300" />
+                    <span className="text-xs font-semibold text-white">
+                      Premium
+                    </span>
+                  </div>
+                  <div className="absolute bottom-3 left-3 text-xs sm:text-sm text-white/90">
+                    Unlimited access to all premium courses
+                  </div>
+                </div>
 
-          {/* Promo Code Input */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Promo Code (Optional)
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                placeholder="Enter promo code"
-                className="flex-1 px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                disabled={processing || validatingPromo || !!appliedPromo}
-              />
-              {!appliedPromo ? (
+                <h2 className="text-base sm:text-lg font-semibold text-foreground mb-3">
+                  Everything you need to master math
+                </h2>
+
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    Ad‑free viewing of all premium lessons
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    Full access to course videos, notes, and materials
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    Track your progress across all courses
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    12 months of unlimited learning for one flat price
+                  </li>
+                </ul>
+
+                <p className="mt-4 text-xs text-muted-foreground">
+                  Valid for 12 months from payment date. Cancel anytime from
+                  your account settings.
+                </p>
+              </div>
+            </div>
+
+            {/* Right side: price + promo + button (md: 2 columns) */}
+            <div className="md:col-span-2 p-4 sm:p-6 flex flex-col justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-3">
+                  Payment details
+                </h3>
+
+                {/* Price line like YouTube Premium headline price */}
+                <div className="mb-4">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl sm:text-3xl font-bold text-primary">
+                      ₹{finalPrice}
+                    </span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">
+                      for 12 months
+                    </span>
+                  </div>
+                  {discount > 0 && (
+                    <div className="mt-1 text-xs text-emerald-600">
+                      You save ₹{discount} with your promo.
+                    </div>
+                  )}
+                </div>
+
+                {/* Promo input */}
+                <div className="mb-5">
+                  <label className="block text-xs font-medium text-foreground mb-1.5">
+                    Promo code (optional)
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={promoCode}
+                      onChange={(e) =>
+                        setPromoCode(e.target.value.toUpperCase())
+                      }
+                      placeholder="ENTER CODE"
+                      className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                      disabled={processing || validatingPromo || !!appliedPromo}
+                    />
+                    {!appliedPromo ? (
+                      <button
+                        onClick={applyPromoCode}
+                        disabled={
+                          validatingPromo || !promoCode.trim() || processing
+                        }
+                        className="px-3 py-2 rounded-lg border border-border text-xs font-medium hover:bg-accent disabled:opacity-50"
+                      >
+                        {validatingPromo ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          "Apply"
+                        )}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setAppliedPromo(null);
+                          setPromoCode("");
+                          setOrderData(null);
+                          setError("");
+                        }}
+                        className="px-3 py-2 rounded-lg bg-red-50 text-xs font-medium text-red-700 hover:bg-red-100 flex items-center gap-1"
+                      >
+                        <XCircle className="w-4 h-4" />
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  {appliedPromo && (
+                    <div className="mt-1.5 text-xs text-emerald-600 flex items-center gap-1">
+                      <CheckCircle2 className="w-4 h-4" />
+                      Promo {appliedPromo.code} applied (
+                      {appliedPromo.discountPercent}% off)
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2 mb-4 border-t border-border/60 pt-3 text-xs sm:text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Subscription price
+                    </span>
+                    <span className="font-medium">₹{originalPrice}</span>
+                  </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-emerald-600">Discount</span>
+                      <span className="font-medium text-emerald-600">
+                        -₹{discount}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between pt-1 text-sm font-semibold">
+                    <span>Total today</span>
+                    <span className="text-primary">₹{finalPrice}</span>
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="mb-3 p-2.5 rounded-lg bg-red-50 border border-red-200 text-xs text-red-600">
+                    {error}
+                  </div>
+                )}
+              </div>
+
+              {/* Pay button */}
+              <div>
                 <button
-                  onClick={applyPromoCode}
-                  disabled={validatingPromo || !promoCode.trim() || processing}
-                  className="px-4 py-2 bg-bg-soft text-foreground rounded-lg hover:bg-border transition-colors disabled:opacity-50"
+                  onClick={handlePayment}
+                  disabled={processing}
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2.5 text-sm font-semibold shadow-sm hover:from-orange-600 hover:to-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {validatingPromo ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                  {processing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Processing...
+                    </>
                   ) : (
-                    "Apply"
+                    <>
+                      <Crown className="w-4 h-4" />
+                      Pay ₹{finalPrice} for 12 months access
+                    </>
                   )}
                 </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    setAppliedPromo(null);
-                    setPromoCode("");
-                    setOrderData(null);
-                    setError("");
-                  }}
-                  className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors flex items-center gap-1"
-                >
-                  <XCircle className="w-4 h-4" /> Remove
-                </button>
-              )}
-            </div>
-
-            {appliedPromo && (
-              <div className="mt-2 text-sm text-green-600 flex items-center gap-1">
-                <CheckCircle2 className="w-4 h-4" />
-                Promo code {appliedPromo.code} applied (
-                {appliedPromo.discountPercent}% off)
+                <p className="mt-2 text-[11px] text-center text-muted-foreground">
+                  Secure payment powered by Razorpay
+                </p>
               </div>
-            )}
-          </div>
-
-          {/* Price Breakdown */}
-          <div className="space-y-3 mb-6 pb-6 border-b border-border">
-            <div className="flex justify-between text-sm">
-              <span className="text-text-secondary">
-                Subscription Price (12 months)
-              </span>
-              <span className="font-medium">₹{originalPrice}</span>
-            </div>
-            {discount > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-green-600">Discount</span>
-                <span className="font-medium text-green-600">-₹{discount}</span>
-              </div>
-            )}
-            <div className="flex justify-between text-lg font-bold pt-2">
-              <span>Total</span>
-              <span className="text-primary">₹{finalPrice}</span>
             </div>
           </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-              {error}
-            </div>
-          )}
-
-          {/* Pay Button */}
-          <button
-            onClick={handlePayment}
-            disabled={processing}
-            className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-lg font-medium hover:from-orange-600 hover:to-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {processing ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              <>
-                <Crown className="w-5 h-5" />
-                Pay ₹{finalPrice} for 12 Months Access
-              </>
-            )}
-          </button>
-
-          <p className="text-xs text-text-secondary text-center mt-4">
-            Secure payment powered by Razorpay
-          </p>
         </div>
       </div>
     </div>

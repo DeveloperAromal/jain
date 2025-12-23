@@ -4,8 +4,8 @@ export const createOrder = async (req, res) => {
   console.debug("[PAYMENT][CREATE_ORDER] Request received");
 
   try {
-    const userId = req.user?.id;
-    const { promoCode } = req.body;
+    
+    const { promoCode, userId } = req.body;
 
     console.debug("[PAYMENT][CREATE_ORDER] User:", userId);
     console.debug("[PAYMENT][CREATE_ORDER] Promo:", promoCode || "NONE");
@@ -39,8 +39,7 @@ export const verifySignature = async (req, res) => {
   console.debug("[PAYMENT][VERIFY] Verification request received");
 
   try {
-    const userId = req.user?.id;
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId } =
       req.body;
 
     console.debug("[PAYMENT][VERIFY] User:", userId);

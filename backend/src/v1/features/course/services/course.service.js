@@ -299,7 +299,6 @@ export async function checkCourseAccess(userId, courseId) {
 
   return { hasAccess: false, reason: "subscription_required" };
 }
-
 export async function getAuthorizedSubjects(user_id) {
   const { data: userData, error: userError } = await supabase
     .from("users")
@@ -309,50 +308,15 @@ export async function getAuthorizedSubjects(user_id) {
 
   if (userError) throw userError;
 
-  const { class: userClass, subscription_active } = userData;
-
-  if (!subscription_active) {
-    const { data: courseData, error: courseError } = await supabase
-      .from("courses")
-      .select("*")
-      .eq("subject_class", userClass);
-
-    if (courseError) throw courseError;
-
-    return {
-      courses: courseData,
-      improvements: [],
-    };
-  }
+  const userClass = userData.class;
+  const subscription_active = userData.subscription_active;
 
   const normalizeCourses = (courses = []) =>
     courses.map((course) => ({
       ...course,
-      is_free: true,
+      is_free: true, 
     }));
 
-  if (userClass === 12) {
-    const { data: courseData, error: courseError } = await supabase
-      .from("courses")
-      .select("*")
-      .eq("subject_class", 12);
-
-    if (courseError) throw courseError;
-
-    const { data: improvementData, error: improvementError } = await supabase
-      .from("courses")
-      .select("*")
-      .eq("subject_class", 11);
-
-    if (improvementError) throw improvementError;
-
-    return {
-      courses: normalizeCourses(courseData),
-      improvements: normalizeCourses(improvementData),
-    };
-  }
-
-  // 🔹 Other classes
   const { data: courseData, error: courseError } = await supabase
     .from("courses")
     .select("*")
@@ -360,8 +324,50 @@ export async function getAuthorizedSubjects(user_id) {
 
   if (courseError) throw courseError;
 
+  const coursesWithLessonCount = await Promise.all(
+    courseData.map(async (course) => {
+      const { data: topicData, error: topicError } = await supabase
+        .from("topics")
+        .select("id")
+        .eq("course_id", course.id);
+
+      if (topicError) throw topicError;
+
+      return {
+        ...course,
+        lesson_count: topicData ? topicData.length : 0,
+      };
+    })
+  );
+
+  let improvements = [];
+  if (userClass === "12") {
+    const { data: improvementData, error: improvementError } = await supabase
+      .from("courses")
+      .select("*")
+      .eq("subject_class", "11");
+
+    if (improvementError) throw improvementError;
+
+    improvements = await Promise.all(
+      improvementData.map(async (course) => {
+        const { data: topicData, error: topicError } = await supabase
+          .from("topics")
+          .select("id")
+          .eq("course_id", course.id);
+
+        if (topicError) throw topicError;
+
+        return {
+          ...course,
+          lesson_count: topicData ? topicData.length : 0,
+        };
+      })
+    );
+  }
+
   return {
-    courses: normalizeCourses(courseData),
-    improvements: [],
+    courses: normalizeCourses(coursesWithLessonCount),
+    improvements: normalizeCourses(improvements),
   };
 }

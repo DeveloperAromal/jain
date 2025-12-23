@@ -30,6 +30,14 @@ export const ApiEndPoints = {
   ADMIN_DELETE_PROMOCODE: `${baseUrl}/payment/admin/promocodes`,
   UPLOAD_VIDEO: `${baseUrl}/upload/video`,
   UPLOAD_IMAGE: `${baseUrl}/upload/image`,
+  GET_ALL_STATUS: `${baseUrl}/admin/status`,
+  GET_ALL_STUDENTS: `${baseUrl}/admin/all_students`,
+
+  GET_EACH_MONTH_REVENUE: (month: string) =>
+    `${baseUrl}/admin/monthly_revenue/${month}`,
+  
+  GET_REVENUE_CHART_DATA: `${baseUrl}/admin/revenue_chart`,
+
   VALIDATE_PROMO: `${baseUrl}/admin/verify-promocodes`,
   GET_COURSE_LIST: (user_id: string) => `${baseUrl}/course/list/${user_id}`,
   GET_TOPICS_LIST: (user_id: string, course_id: string) =>

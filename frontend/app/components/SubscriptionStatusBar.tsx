@@ -5,6 +5,7 @@ import { useAPICall } from "@/app/hooks/useApiCall";
 import { ApiEndPoints } from "@/app/config/Backend";
 import Cookies from "js-cookie";
 import Link from "next/link";
+import { Crown } from "lucide-react";
 
 export default function SubscriptionStatusBar() {
   const { makeApiCall } = useAPICall();
@@ -44,30 +45,16 @@ export default function SubscriptionStatusBar() {
     fetchSubscriptionStatus();
   }, [makeApiCall]);
 
-  if (loading || hasSubscription === null) return null;
-
-  let message = "Upgrade to Premium";
-  let bgClass =
-    "bg-gradient-to-r from-red-900 via-red-700 to-red-800 text-red-200";
-
-  if (hasSubscription) {
-    const months = Math.floor(daysRemaining / 30);
-    const days = daysRemaining % 30;
-
-    message = `Premium Active  ${months > 0 ? `${months} months ` : ""}${
-      days > 0 ? `${days} days` : ""
-    } left`;
-
-    bgClass =
-      "bg-gradient-to-r from-purple-800 via-pink-700 to-purple-900 text-pink-200";
-  }
+  // Hide banner completely if user has active paid subscription
+  if (loading || hasSubscription === null || hasSubscription) return null;
 
   return (
-    <Link href="/learn/dashboard/payment">
-      <div
-        className={`${bgClass} w-full py-1 text-center text-sm font-medium cursor-pointer`}
-      >
-        {message}
+    <Link href="/learn/dashboard/payment" className="block no-underline">
+      <div className="w-full py-2 px-4 text-center text-sm font-medium cursor-pointer border-b border-orange-200/50 bg-orange-500/10 text-orange-800 transition-colors hover:bg-accent/50">
+        <span className="inline-flex items-center justify-center gap-1">
+          <Crown className="w-4 h-4" />
+          Upgrade to Premium
+        </span>
       </div>
     </Link>
   );

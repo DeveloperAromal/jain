@@ -12,9 +12,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: string;
-  company_name: string;
-  client_id: string;
+  class: string;
   subscription_active: boolean;
 }
 
@@ -26,6 +24,7 @@ export interface AuthContextType {
 }
 
 export interface Course {
+  lesson_count: number;
   cover_image: string | StaticImport;
   duration_minutes: string;
   id: string | number;

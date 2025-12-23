@@ -5,7 +5,6 @@ import { supabase } from "../../../config/supabase.config.js";
 const BASE_PRICE = 999;
 const SUBSCRIPTION_MONTHS = 12;
 
-
 export const verifySignatureService = (payload, signature) => {
   console.debug("[PAYMENT][SIGNATURE] Verifying signature");
 
@@ -25,7 +24,6 @@ export const verifySignatureService = (payload, signature) => {
 
   return valid;
 };
-
 
 export const createSubscriptionOrder = async ({ userId, promoCode }) => {
   console.debug("[PAYMENT][SERVICE][CREATE_ORDER] Start");
@@ -74,7 +72,9 @@ export const createSubscriptionOrder = async ({ userId, promoCode }) => {
   });
 
   console.info("[PAYMENT][RAZORPAY] Order created:", razorpayOrder.id);
-
+  const currentMonth = new Date().toLocaleString("en-US", {
+    month: "long",
+  });
   const start = new Date();
   const end = new Date(start);
   end.setMonth(end.getMonth() + SUBSCRIPTION_MONTHS);
@@ -89,6 +89,7 @@ export const createSubscriptionOrder = async ({ userId, promoCode }) => {
     subscription_months: SUBSCRIPTION_MONTHS,
     subscription_start_date: start,
     subscription_end_date: end,
+    month: currentMonth,
   });
 
   if (orderError) {
@@ -103,7 +104,6 @@ export const createSubscriptionOrder = async ({ userId, promoCode }) => {
     discount,
   };
 };
-
 
 export const verifySubscriptionPayment = async ({
   userId,

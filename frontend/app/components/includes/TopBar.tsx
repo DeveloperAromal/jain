@@ -3,28 +3,29 @@
 import { Menu } from "lucide-react";
 import Avatar from "./Avatar";
 
-export default function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
+export default function TopBar({ onMenuClick } : { onMenuClick? : () => void }) {
   return (
-    <header className="h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 border-b border-[var(--border)] bg-white shadow-sm sticky top-0 z-10">
-      <div className="flex items-center gap-3 sm:gap-6 flex-1 min-w-0">
-        <h2 className="font-semibold text-lg sm:text-xl md:text-2xl text-[var(--foreground)] truncate">
-          Jain Math Hub
-        </h2>
+    <header className="sticky top-0 z-20 h-14 sm:h-16 flex items-center justify-between px-3 sm:px-5 border-b border-border bg-white/95 backdrop-blur">
+      {/* Left: menu + brand (like YouTube logo + text) */}
+      <div className="flex items-center gap-3 flex-1 min-w-0">
         <button
           onClick={onMenuClick}
-          className="md:hidden p-2 rounded-lg hover:bg-bg-soft transition-colors"
+          className="md:hidden p-2 rounded-full hover:bg-accent transition-colors"
           aria-label="Toggle menu"
         >
-          <Menu className="w-5 h-5 text-text-secondary hover:text-foreground transition-colors" />
+          <Menu className="w-5 h-5 text-muted-foreground" />
         </button>
+
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="h-6 w-6 rounded bg-primary" />
+          <h2 className="font-semibold text-base sm:text-lg md:text-xl text-foreground truncate">
+            Jain Math Hub
+          </h2>
+        </div>
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-4">
-        {/* <button className="relative p-2 rounded-lg hover:bg-bg-soft transition-colors group">
-          <Bell className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-[var(--foreground)] transition-colors" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[var(--primary)] rounded-full"></span>
-        </button> */}
-        <div className="h-6 w-px bg-border hidden sm:block"></div>
+      <div className="flex items-center gap-3 sm:gap-4">
+        <div className="hidden sm:block h-6 w-px bg-border" />
         <Avatar />
       </div>
     </header>
