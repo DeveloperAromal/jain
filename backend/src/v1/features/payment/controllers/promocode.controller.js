@@ -8,7 +8,6 @@ export const createPromoCode = async (req, res) => {
     console.debug("[PROMO][CREATE] Payload:", req.body);
 
     const { code, discount_percent, max_uses, expires, description } = req.body;
-    const created_by = req.user?.id;
 
     if (!code || !discount_percent) {
       return res.status(400).json({
@@ -23,7 +22,6 @@ export const createPromoCode = async (req, res) => {
       max_uses,
       expires,
       description,
-      created_by,
     });
 
     return res.status(201).json({

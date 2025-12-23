@@ -19,7 +19,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const menuItems = [
     { name: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Courses", url: "/admin/dashboard/courses", icon: Book },
-    { name: "Promo Codes", url: "/admin/dashboard/promocodes", icon: Tag },
+    { name: "Promo Codes", url: "/admin/dashboard/promocode/new", icon: Tag },
   ];
 
   return (

@@ -219,7 +219,7 @@ export default function AdminDashboard() {
               </div>
             </Link>
             <Link
-              href="/admin/promocodes/new"
+              href="/admin/dashboard/promocode/new"
               className="group flex items-center gap-4 p-6 border border-border rounded-xl hover:shadow-lg hover:border-primary/50 transition-all"
             >
               <div className="p-3 rounded-xl bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-all">
@@ -235,7 +235,7 @@ export default function AdminDashboard() {
               </div>
             </Link>
             <Link
-              href="/admin/users"
+              href="/admin/dashboard/students"
               className="group flex items-center gap-4 p-6 border border-border rounded-xl hover:shadow-lg hover:border-primary/50 transition-all md:col-span-2"
             >
               <div className="p-3 rounded-xl bg-orange-500/10 group-hover:bg-orange-500/20 transition-all">

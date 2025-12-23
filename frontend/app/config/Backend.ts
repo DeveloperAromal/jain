@@ -24,10 +24,10 @@ export const ApiEndPoints = {
   ADMIN_DELETE_COURSE: `${baseUrl}/admin/courses`,
   ADMIN_TOGGLE_COURSE_FREE: `${baseUrl}/admin/toggle-free`,
   ADMIN_CREATE_TOPIC: `${baseUrl}/admin/topics`,
-  ADMIN_GET_PROMOCODES: `${baseUrl}/payment/admin/promocodes`,
-  ADMIN_CREATE_PROMOCODE: `${baseUrl}/payment/admin/promocodes`,
-  ADMIN_UPDATE_PROMOCODE: `${baseUrl}/payment/admin/promocodes`,
-  ADMIN_DELETE_PROMOCODE: `${baseUrl}/payment/admin/promocodes`,
+  ADMIN_GET_PROMOCODES: `${baseUrl}/admin/promocodes`,
+  ADMIN_CREATE_PROMOCODE: `${baseUrl}/admin/promocodes`,
+  ADMIN_UPDATE_PROMOCODE: `${baseUrl}/admin/promocodes`,
+  ADMIN_DELETE_PROMOCODE: `${baseUrl}/admin/promocodes`,
   UPLOAD_VIDEO: `${baseUrl}/upload/video`,
   UPLOAD_IMAGE: `${baseUrl}/upload/image`,
   GET_ALL_STATUS: `${baseUrl}/admin/status`,
@@ -35,7 +35,7 @@ export const ApiEndPoints = {
 
   GET_EACH_MONTH_REVENUE: (month: string) =>
     `${baseUrl}/admin/monthly_revenue/${month}`,
-  
+
   GET_REVENUE_CHART_DATA: `${baseUrl}/admin/revenue_chart`,
 
   VALIDATE_PROMO: `${baseUrl}/admin/verify-promocodes`,
