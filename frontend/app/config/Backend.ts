@@ -32,4 +32,6 @@ export const ApiEndPoints = {
   UPLOAD_IMAGE: `${baseUrl}/upload/image`,
   VALIDATE_PROMO: `${baseUrl}/admin/verify-promocodes`,
   GET_COURSE_LIST: (user_id: string) => `${baseUrl}/course/list/${user_id}`,
+  GET_TOPICS_LIST: (user_id: string, course_id: string) =>
+    `${baseUrl}/course/topics/${user_id}/${course_id}`,
 };

@@ -68,5 +68,35 @@ export async function togleTopicFree(topic_id) {
 
   if (error) throw error;
   return data;
-} 
+}
+
+export async function getAuthorizedTopic(user_id, course_id) {
+  const { data: userData, error: userError } = await supabase
+    .from("users")
+    .select("id, subscription_active")
+    .eq("id", user_id)
+    .single();
+
+  if (userError) throw userError;
+
+  const { subscription_active } = userData;
+
+  const { data: topicData, error: topicError } = await supabase
+    .from("topics")
+    .select(
+      "id, title, description, thumbnail_img, tags, duration_minutes, is_free"
+    )
+    .eq("course_id", course_id);
+
+  if (topicError) throw topicError;
+
+  if (!subscription_active) {
+    return topicData;
+  }
+
+  return topicData.map((topic) => ({
+    ...topic,
+    is_free: true, 
+  }));
+}
 
