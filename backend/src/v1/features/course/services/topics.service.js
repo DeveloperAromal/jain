@@ -8,6 +8,7 @@ export async function createTopic({
   thumbnail_img,
   video_url,
   duration_minutes,
+  is_free,
   sequence_order,
 }) {
   if (!sequence_order) {
@@ -38,6 +39,7 @@ export async function createTopic({
         duration_minutes,
         sequence_order,
         is_published: true,
+        is_free: !!is_free,
       },
     ])
     .select("*");
@@ -90,13 +92,8 @@ export async function getAuthorizedTopic(user_id, course_id) {
 
   if (topicError) throw topicError;
 
-  if (!subscription_active) {
-    return topicData;
-  }
-
   return topicData.map((topic) => ({
     ...topic,
-    is_free: true, 
+    is_unlocked: topic.is_free || subscription_active,
   }));
 }
-

@@ -15,6 +15,7 @@ export const create_topic = async (req, res) => {
       thumbnail_img,
       video_url,
       duration_minutes,
+      is_free,
       sequence_order,
     } = req.body;
 
@@ -26,6 +27,7 @@ export const create_topic = async (req, res) => {
       thumbnail_img,
       video_url,
       duration_minutes,
+      is_free,
       sequence_order,
     });
 

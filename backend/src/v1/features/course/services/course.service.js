@@ -299,6 +299,7 @@ export async function checkCourseAccess(userId, courseId) {
 
   return { hasAccess: false, reason: "subscription_required" };
 }
+
 export async function getAuthorizedSubjects(user_id) {
   const { data: userData, error: userError } = await supabase
     .from("users")
@@ -311,10 +312,10 @@ export async function getAuthorizedSubjects(user_id) {
   const userClass = userData.class;
   const subscription_active = userData.subscription_active;
 
-  const normalizeCourses = (courses = []) =>
+  const normalizeCourses = (courses = [], subscription_active) =>
     courses.map((course) => ({
       ...course,
-      is_free: true, 
+      is_free: course.is_free || subscription_active,
     }));
 
   const { data: courseData, error: courseError } = await supabase
@@ -365,9 +366,9 @@ export async function getAuthorizedSubjects(user_id) {
       })
     );
   }
+return {
+  courses: normalizeCourses(coursesWithLessonCount, subscription_active),
+  improvements: normalizeCourses(improvements, subscription_active),
+};
 
-  return {
-    courses: normalizeCourses(coursesWithLessonCount),
-    improvements: normalizeCourses(improvements),
-  };
 }

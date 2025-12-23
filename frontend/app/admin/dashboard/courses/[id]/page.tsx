@@ -28,6 +28,7 @@ export default function CourseDetails() {
     thumbnail_img: "",
     duration_minutes: "",
     sequence_order: "",
+    is_free: false, // added field
   });
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
@@ -47,7 +48,10 @@ export default function CourseDetails() {
         token
       );
 
-      const courseData = response?.data?.data?.course || response?.data?.course || response?.data;
+      const courseData =
+        response?.data?.data?.course ||
+        response?.data?.course ||
+        response?.data;
       setCourse(courseData as Course);
     } catch (error) {
       console.error("Error fetching course:", error);
@@ -141,7 +145,9 @@ export default function CourseDetails() {
     });
   }
 
-  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleThumbnailUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -170,7 +176,10 @@ export default function CourseDetails() {
 
       const result = await response.json();
       if (result.success && result.data?.url) {
-        setTopicFormData((prev) => ({ ...prev, thumbnail_img: result.data.url }));
+        setTopicFormData((prev) => ({
+          ...prev,
+          thumbnail_img: result.data.url,
+        }));
       } else {
         alert("Failed to upload thumbnail");
       }
@@ -182,8 +191,6 @@ export default function CourseDetails() {
     }
   };
 
-  
-
   const handleTopicSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -194,21 +201,24 @@ export default function CourseDetails() {
 
       if (topicFormData.video_url) {
         const durationSeconds = await getVideoDuration(topicFormData.video_url);
-
         durationMinutes = Math.ceil(durationSeconds / 60);
       }
-
 
       await makeApiCall(
         "POST",
         ApiEndPoints.ADMIN_CREATE_TOPIC,
         {
           course_id: courseId,
-          ...topicFormData,
+          title: topicFormData.title,
+          description: topicFormData.description,
+          tags: topicFormData.tags,
+          video_url: topicFormData.video_url,
+          thumbnail_img: topicFormData.thumbnail_img,
           duration_minutes: durationMinutes,
           sequence_order: topicFormData.sequence_order
             ? parseInt(topicFormData.sequence_order)
             : null,
+          is_free: !!topicFormData.is_free, 
         },
         "application/json",
         token
@@ -223,6 +233,7 @@ export default function CourseDetails() {
         thumbnail_img: "",
         duration_minutes: "",
         sequence_order: "",
+        is_free: false,
       });
       setVideoFile(null);
       setThumbnailFile(null);
@@ -244,7 +255,10 @@ export default function CourseDetails() {
     return (
       <div className="text-center py-12">
         <p className="text-text-secondary">Course not found</p>
-        <Link href="/admin/dashboard/courses" className="text-primary hover:underline mt-4 inline-block">
+        <Link
+          href="/admin/dashboard/courses"
+          className="text-primary hover:underline mt-4 inline-block"
+        >
           Back to Courses
         </Link>
       </div>
@@ -432,6 +446,25 @@ export default function CourseDetails() {
               </div>
             </div>
 
+            {/* New is_free checkbox */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={topicFormData.is_free}
+                onChange={(e) =>
+                  setTopicFormData({
+                    ...topicFormData,
+                    is_free: e.target.checked,
+                  })
+                }
+                id="is_free"
+                className="w-4 h-4"
+              />
+              <label htmlFor="is_free" className="text-sm text-foreground">
+                Free Topic
+              </label>
+            </div>
+
             <div className="flex items-center gap-4 pt-4 border-t border-neutral-900">
               <button
                 type="submit"
@@ -459,6 +492,7 @@ export default function CourseDetails() {
                     thumbnail_img: "",
                     duration_minutes: "",
                     sequence_order: "",
+                    is_free: false,
                   });
                 }}
                 className="px-6 py-3 border border-neutral-900 rounded-lg hover:bg-bg-soft transition-colors text-foreground"
@@ -472,7 +506,7 @@ export default function CourseDetails() {
 
       <div className="bg-white rounded-xl border border-neutral-900 p-6 sm:p-8">
         <h2 className="text-xl font-bold text-foreground mb-6">
-          {(topics.length <= 1) ? "Topic" : "Topics" } ({topics.length})
+          {topics.length <= 1 ? "Topic" : "Topics"} ({topics.length})
         </h2>
         {topics.length === 0 ? (
           <p className="text-text-secondary text-center py-8">
@@ -485,15 +519,11 @@ export default function CourseDetails() {
                 key={topic.id}
                 className="flex items-center gap-4 p-4 border border-neutral-900 rounded-lg hover:bg-bg-soft transition-colors"
               >
-                  {topic.thumbnail_img && (
-                    <div className="relative w-24 h-16 sm:w-32 sm:h-20 rounded-lg overflow-hidden">
-                      <Image
-                        src={topic.thumbnail_img}
-                        alt={topic.title}
-                        fill
-                      />
-                    </div>
-                  )}
+                {topic.thumbnail_img && (
+                  <div className="relative w-24 h-16 sm:w-32 sm:h-20 rounded-lg overflow-hidden">
+                    <Image src={topic.thumbnail_img} alt={topic.title} fill />
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
@@ -519,6 +549,17 @@ export default function CourseDetails() {
                     {topic.video_url && (
                       <span className="text-green-600">Video uploaded</span>
                     )}
+                    {topic.is_free !== undefined && (
+                      <span
+                        className={`px-1 rounded ${
+                          topic.is_free
+                            ? "bg-green-100 text-green-700"
+                            : "bg-orange-100 text-orange-700"
+                        }`}
+                      >
+                        {topic.is_free ? "Free" : "Paid"}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -529,4 +570,3 @@ export default function CourseDetails() {
     </div>
   );
 }
-

@@ -10,13 +10,13 @@ import {
 
 const router = express.Router();
 
-router.use("/admin", Protect, authorizeAdmin);
+router.use("/admin", Protect);
 
 router.post("/admin/promocodes", createPromoCode);
 router.get("/admin/promocodes", getAllPromoCodes);
 router.put("/admin/promocodes/:id", updatePromoCode);
 router.delete("/admin/promocodes/:id", deletePromoCode);
-router.post("/admin/verify-promocodes", validatePromoCode);
+router.post("/admin/verify-promocodes", Protect, validatePromoCode);
 
 
 

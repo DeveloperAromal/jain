@@ -16,7 +16,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const { makeApiCall } = useAPICall();
   const router = useRouter();
 
-  // Check token validity and handle expiration
   useEffect(() => {
     const token = Cookies.get("token");
 
