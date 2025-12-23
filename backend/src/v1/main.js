@@ -27,11 +27,14 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ["https://jainmathshub.vercel.app", "http://localhost:3000"],
+    origin: ["http://localhost:3000", "https://jainmathshub.vercel.app"],
     credentials: true,
+    allowedHeaders: ["Authorization", "Content-Type", "Range"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
 );
 
+app.options("*", cors()); 
 
 app.get("/", (req, res) => {
   res.send("Jain Academy api");
