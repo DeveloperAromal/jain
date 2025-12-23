@@ -9,14 +9,13 @@ import CallToAction from "./components/CalltoAction";
 
 export default function LandingPage() {
   return (
-    <main suppressHydrationWarning={true}>
-
-        <Navbar />
-        <Hero />
-        <CourseWeOffer />
-        <BentoGridThirdDemo />
-        <CallToAction />
-        <Footer />
+    <main suppressHydrationWarning={true} suppressContentEditableWarning>
+      <Navbar />
+      <Hero />
+      <CourseWeOffer />
+      <BentoGridThirdDemo />
+      <CallToAction />
+      <Footer />
     </main>
   );
 }

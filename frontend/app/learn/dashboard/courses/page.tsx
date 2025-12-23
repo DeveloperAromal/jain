@@ -7,7 +7,6 @@ import { useAPICall } from "@/app/hooks/useApiCall";
 import { ApiEndPoints } from "@/app/config/Backend";
 import {
   BookOpen,
-  Clock,
   ArrowRight,
   Search,
   Filter,
@@ -15,8 +14,8 @@ import {
   Crown,
   X,
 } from "lucide-react";
-import Cookies from "js-cookie";
 import { Course } from "@/app/types/dashboardTypes";
+import { useAuth } from "@/app/hooks/useAuth";
 
 export default function Courses() {
   const { makeApiCall } = useAPICall();
@@ -25,33 +24,34 @@ export default function Courses() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchCourses = useCallback(async () => {
-    try {
-      setLoading(true);
-      const token = Cookies.get("token");
-      if (!token) return;
-
-      const response = await makeApiCall(
-        "GET",
-        ApiEndPoints.GET_STUDENT_COURSES,
-        null,
-        "application/json",
-        token
-      );
-
-      const data = response?.data?.data;
-      setCourses((data?.courses || []) as Course[]);
-      setLen(data.courses.length);
-    } catch (e) {
-      console.error("Error fetching courses:", e);
-    } finally {
-      setLoading(false);
-    }
-  }, [makeApiCall]);
-
-  useEffect(() => {
-    fetchCourses();
-  }, [fetchCourses]);
+ const auth = useAuth();
+   const { user } = auth;
+ 
+ useEffect(() => {
+   if (!user?.id) return;
+ 
+   const fetchCourses = async () => {
+     try {
+       setLoading(true);
+ 
+       const response = await makeApiCall(
+         "GET",
+         ApiEndPoints.GET_COURSE_LIST(user.id),
+         null,
+         "application/json"
+       );
+ 
+       setCourses(response?.data?.data.course?.courses || []);
+     } catch (e) {
+       console.error("Error fetching courses:", e);
+     } finally {
+       setLoading(false);
+     }
+   };
+ 
+   fetchCourses();
+ }, [makeApiCall, user?.id]);
+ 
 
   const filteredCourses = courses.filter((course) =>
     [course.subject, course.description, course.subject_class].some((field) =>

@@ -29,7 +29,6 @@ export async function createCourse({
   return data[0];
 }
 
-
 export async function getAllCourse() {
   const { data, error } = await supabase
     .from("courses")
@@ -70,7 +69,6 @@ export async function getFreeCourses() {
   return data || [];
 }
 
-// Admin: Toggle course free/paid status
 export async function toggleCourseFreeStatus(courseID, is_free) {
   if (!courseID) {
     throw new Error("Course ID is required");
@@ -87,7 +85,6 @@ export async function toggleCourseFreeStatus(courseID, is_free) {
   return data || [];
 }
 
-// Get courses for unpaid users (only free courses)
 export async function getCoursesForUnpaidStudent() {
   const { data, error } = await supabase
     .from("courses")
@@ -100,7 +97,6 @@ export async function getCoursesForUnpaidStudent() {
   return data || [];
 }
 
-// Check user subscription status (7 days free trial + 12 months paid subscription)
 export async function getUserSubscriptionStatus(userId) {
   if (!userId) {
     throw new Error("User ID is required");
@@ -122,7 +118,6 @@ export async function getUserSubscriptionStatus(userId) {
   const isFreeTrialActive = daysSinceSignup < 7;
   const daysRemaining = Math.max(0, 7 - daysSinceSignup);
 
-  // Check if user has active paid subscription (12 months from payment)
   let hasPaidSubscription = false;
   let subscriptionEndDate = null;
   let subscriptionDaysRemaining = 0;
@@ -130,12 +125,13 @@ export async function getUserSubscriptionStatus(userId) {
   if (user.subscription_active && user.subscription_end_date) {
     subscriptionEndDate = new Date(user.subscription_end_date);
     hasPaidSubscription = subscriptionEndDate > now;
-    
+
     if (hasPaidSubscription) {
-      const daysUntilExpiry = Math.floor((subscriptionEndDate - now) / (1000 * 60 * 60 * 24));
+      const daysUntilExpiry = Math.floor(
+        (subscriptionEndDate - now) / (1000 * 60 * 60 * 24)
+      );
       subscriptionDaysRemaining = Math.max(0, daysUntilExpiry);
     } else {
-      // Subscription expired, update user record
       await supabase
         .from("users")
         .update({ subscription_active: false })
@@ -151,20 +147,29 @@ export async function getUserSubscriptionStatus(userId) {
       .order("created_at", { ascending: false })
       .limit(1);
 
-    if (paidOrders && paidOrders.length > 0 && paidOrders[0].subscription_end_date) {
+    if (
+      paidOrders &&
+      paidOrders.length > 0 &&
+      paidOrders[0].subscription_end_date
+    ) {
       subscriptionEndDate = new Date(paidOrders[0].subscription_end_date);
       hasPaidSubscription = subscriptionEndDate > now;
-      
+
       if (hasPaidSubscription) {
-        const daysUntilExpiry = Math.floor((subscriptionEndDate - now) / (1000 * 60 * 60 * 24));
+        const daysUntilExpiry = Math.floor(
+          (subscriptionEndDate - now) / (1000 * 60 * 60 * 24)
+        );
         subscriptionDaysRemaining = Math.max(0, daysUntilExpiry);
-        
+
         // Update user subscription status
         await supabase
           .from("users")
           .update({
             subscription_active: true,
-            subscription_start_date: new Date(paidOrders[0].subscription_end_date.getTime() - 365 * 24 * 60 * 60 * 1000),
+            subscription_start_date: new Date(
+              paidOrders[0].subscription_end_date.getTime() -
+                365 * 24 * 60 * 60 * 1000
+            ),
             subscription_end_date: subscriptionEndDate,
           })
           .eq("id", userId);
@@ -173,16 +178,17 @@ export async function getUserSubscriptionStatus(userId) {
   }
 
   return {
-    isFreeTrialActive: isFreeTrialActive && !hasPaidSubscription,
-    daysRemaining,
+    // isFreeTrialActive: isFreeTrialActive && !hasPaidSubscription,
+    // daysRemaining,
     hasPaidSubscription,
-    subscriptionEndDate: subscriptionEndDate ? subscriptionEndDate.toISOString() : null,
+    subscriptionEndDate: subscriptionEndDate
+      ? subscriptionEndDate.toISOString()
+      : null,
     subscriptionDaysRemaining,
-    subscriptionType: hasPaidSubscription ? "paid" : (isFreeTrialActive ? "free_trial" : "expired"),
+    subscriptionType: hasPaidSubscription ? "paid" : "pending",
   };
 }
 
-// Get courses with access status for user
 export async function getCoursesWithAccessStatus(userId) {
   if (!userId) {
     throw new Error("User ID is required");
@@ -190,7 +196,9 @@ export async function getCoursesWithAccessStatus(userId) {
 
   // Get subscription status
   const subscriptionStatus = await getUserSubscriptionStatus(userId);
-  const hasAccess = subscriptionStatus.hasPaidSubscription || subscriptionStatus.isFreeTrialActive;
+  const hasAccess =
+    subscriptionStatus.hasPaidSubscription ||
+    subscriptionStatus.isFreeTrialActive;
 
   // Get all courses
   const { data: allCourses, error: coursesError } = await supabase
@@ -207,7 +215,9 @@ export async function getCoursesWithAccessStatus(userId) {
     .eq("user_id", userId)
     .eq("status", "active");
 
-  const enrolledCourseIds = new Set((enrollments || []).map((e) => e.course_id));
+  const enrolledCourseIds = new Set(
+    (enrollments || []).map((e) => e.course_id)
+  );
 
   // Map courses with access status
   // If user has paid subscription, they have access to ALL courses (except free ones are always accessible)
@@ -231,13 +241,11 @@ export async function getCoursesWithAccessStatus(userId) {
   };
 }
 
-// Check if user has access to a specific course
 export async function checkCourseAccess(userId, courseId) {
   if (!userId || !courseId) {
     throw new Error("User ID and Course ID are required");
   }
 
-  // Get course
   const { data: course, error: courseError } = await supabase
     .from("courses")
     .select("*")
@@ -248,17 +256,83 @@ export async function checkCourseAccess(userId, courseId) {
     throw new Error("Course not found");
   }
 
-  // If course is free, user has access
   if (course.is_free) {
     return { hasAccess: true, reason: "free_course" };
   }
 
-  // Check subscription status (paid subscription gives access to ALL courses)
   const subscriptionStatus = await getUserSubscriptionStatus(userId);
-  if (subscriptionStatus.hasPaidSubscription || subscriptionStatus.isFreeTrialActive) {
+  if (
+    subscriptionStatus.hasPaidSubscription ||
+    subscriptionStatus.isFreeTrialActive
+  ) {
     return { hasAccess: true, reason: "subscription" };
   }
 
-  // If no subscription, paid courses are locked
   return { hasAccess: false, reason: "subscription_required" };
+}
+
+export async function getAuthorizedSubjects(user_id) {
+  const { data: userData, error: userError } = await supabase
+    .from("users")
+    .select("id, class, subscription_active")
+    .eq("id", user_id)
+    .single();
+
+  if (userError) throw userError;
+
+  const { class: userClass, subscription_active } = userData;
+
+  if (!subscription_active) {
+    const { data: courseData, error: courseError } = await supabase
+      .from("courses")
+      .select("*")
+      .eq("subject_class", userClass);
+
+    if (courseError) throw courseError;
+
+    return {
+      courses: courseData,
+      improvements: [],
+    };
+  }
+
+  const normalizeCourses = (courses = []) =>
+    courses.map((course) => ({
+      ...course,
+      is_free: true,
+    }));
+
+  if (userClass === 12) {
+    const { data: courseData, error: courseError } = await supabase
+      .from("courses")
+      .select("*")
+      .eq("subject_class", 12);
+
+    if (courseError) throw courseError;
+
+    const { data: improvementData, error: improvementError } = await supabase
+      .from("courses")
+      .select("*")
+      .eq("subject_class", 11);
+
+    if (improvementError) throw improvementError;
+
+    return {
+      courses: normalizeCourses(courseData),
+      improvements: normalizeCourses(improvementData),
+    };
+  }
+
+  // 🔹 Other classes
+  const { data: courseData, error: courseError } = await supabase
+    .from("courses")
+    .select("*")
+    .eq("subject_class", userClass);
+
+  if (courseError) throw courseError;
+
+  return {
+    courses: normalizeCourses(courseData),
+    improvements: [],
+  };
 }

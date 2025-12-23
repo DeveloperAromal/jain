@@ -2,7 +2,13 @@ import * as studentAuthService from "../services/student.auth.service.js";
 
 export const signUpStudent = async (req, res) => {
   try {
-    const { email, password, name, phone, class: student_class } = req.body;
+    const {
+      email,
+      password,
+      phone,
+      name,
+      student_class,
+    } = req.body;
 
     const result = await studentAuthService.signUpStudent({
       email,

@@ -1,14 +1,14 @@
 import {
   toggleCourseFreeStatus,
   getCoursesForUnpaidStudent,
-  getFreeCourses,
   getAllCourse,
   createCourse,
   getCourseByID,
   getUserSubscriptionStatus,
   getCoursesWithAccessStatus,
   checkCourseAccess,
-} from "../services/create_course.service.js";
+  getAuthorizedSubjects,
+} from "../services/course.service.js";
 
 const isValidUUID = (uuid) => {
   const uuidRegex =
@@ -243,3 +243,31 @@ export const getCourseById = async (req, res) => {
     });
   }
 };
+export async function getAuthorizedSubjectHandler(req, res) {
+  try {
+     const user_id = req.params.user_id;
+
+    if (!user_id) {
+      return res.status(400).json({
+        success: false,
+        message: "user_id is required",
+      });
+    }
+
+    const data = await getAuthorizedSubjects(user_id);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        course: data,
+      },
+    });
+  } catch (error) {
+    console.error("getAuthorizedSubjectHandler error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}

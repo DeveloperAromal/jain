@@ -1,6 +1,7 @@
 import {
   createTopic,
   getTopicsByCourseID,
+  togleTopicFree,
 } from "../services/topics.service.js";
 
 export const create_topic = async (req, res) => {
@@ -58,6 +59,26 @@ export const get_topics_by_course = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: `Failed to fetch topics: ${e.message || e}`,
+    });
+  }
+};
+
+export const updateToggleIsFree = async (req, res) => {
+  try {
+    const { topic_id } = req.params;
+
+    const topics = await togleTopicFree(topic_id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Updated",
+      topics,
+    });
+  } catch (e) {
+    console.error("update_topics_by_course error:", e);
+    return res.status(500).json({
+      success: false,
+      message: `Failed to update: ${e.message || e}`,
     });
   }
 };

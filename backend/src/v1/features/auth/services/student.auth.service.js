@@ -25,6 +25,7 @@ export const signUpStudent = async ({
     throw new Error("Email already registered");
   }
 
+  console.log(studentClass, student_class)
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const { data: newUser, error } = await supabase

@@ -9,6 +9,7 @@ import {
   getStudentCoursesWithAccess,
   checkStudentCourseAccess,
   getCourseById,
+  getAuthorizedSubjectHandler,
 } from "../controllers/course.controller.js";
 import {
   adminCreateCourse,
@@ -174,6 +175,7 @@ router.get("/student/subscription-status", Protect, getStudentSubscriptionStatus
 router.get("/student/courses", Protect, getStudentCoursesWithAccess);
 router.get("/student/course/:courseId/access", Protect, checkStudentCourseAccess);
 router.get("/courses/:courseId", getCourseById);
+router.get("/course/list/:user_id", getAuthorizedSubjectHandler);
 
 export default router;
 

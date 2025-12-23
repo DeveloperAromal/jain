@@ -84,47 +84,46 @@ export default function PaymentPage() {
     }
   };
 
-const createOrder = async (): Promise<OrderResponse | null> => {
-  setProcessing(true);
-  setError("");
+  const createOrder = async (): Promise<OrderResponse | null> => {
+    setProcessing(true);
+    setError("");
 
-  try {
-    const token = Cookies.get("token");
-    if (!token) {
-      setError("Please log in to continue");
+    try {
+      const token = Cookies.get("token");
+      if (!token) {
+        setError("Please log in to continue");
+        return null;
+      }
+
+      const userId = user?.id;
+      if (!userId) {
+        setError("User information not found. Please log in again.");
+        return null;
+      }
+
+      const res = await makeApiCall(
+        "POST",
+        ApiEndPoints.CREATE_PAYMENT_ORDER,
+        {
+          promoCode: appliedPromo ? promoCode : undefined,
+          userId,
+        },
+        "application/json",
+        token
+      );
+
+      const data = (res?.data?.data || res?.data || res) as OrderResponse;
+
+      setOrderData(data);
+
+      return data;
+    } catch (err) {
+      setError("Failed to create order. Please try again.");
       return null;
+    } finally {
+      setProcessing(false);
     }
-
-    const userId = user?.id;
-    if (!userId) {
-      setError("User information not found. Please log in again.");
-      return null;
-    }
-
-    const res = await makeApiCall(
-      "POST",
-      ApiEndPoints.CREATE_PAYMENT_ORDER,
-      {
-        promoCode: appliedPromo ? promoCode : undefined,
-        userId,
-      },
-      "application/json",
-      token
-    );
-
-    const data = (res?.data?.data || res?.data || res) as OrderResponse;
-
-    setOrderData(data);
-
-    return data;
-  } catch (err) {
-    setError("Failed to create order. Please try again.");
-    return null;
-  } finally {
-    setProcessing(false);
-  }
-};
-
+  };
 
   const handlePayment = async () => {
     setError("");
@@ -189,7 +188,6 @@ const createOrder = async (): Promise<OrderResponse | null> => {
     new window.Razorpay(options).open();
   };
 
-
   if (paymentSuccess) {
     return (
       <div className="max-w-4xl mx-auto px-6 py-12">
@@ -206,13 +204,13 @@ const createOrder = async (): Promise<OrderResponse | null> => {
     );
   }
 
-const finalPrice = appliedPromo
-  ? Math.max(
-      originalPrice -
-        Math.round((appliedPromo.discountPercent / 100) * originalPrice),
-      0
-    )
-  : originalPrice;
+  const finalPrice = appliedPromo
+    ? Math.max(
+        originalPrice -
+          Math.round((appliedPromo.discountPercent / 100) * originalPrice),
+        0
+      )
+    : originalPrice;
   const discount = originalPrice - finalPrice;
 
   return (
@@ -276,7 +274,6 @@ const finalPrice = appliedPromo
           </div>
         </div>
 
-        {/* Right: Payment Details */}
         <div className="bg-white rounded-xl border border-border p-6">
           <h3 className="text-lg font-bold text-foreground mb-4">
             Payment Details

@@ -8,36 +8,45 @@ import { ApiEndPoints } from "@/app/config/Backend";
 import { BookOpen, ArrowRight, Lock, Crown } from "lucide-react";
 import Image from "next/image";
 import { Course } from "@/app/types/dashboardTypes";
+import { useAuth } from "@/app/hooks/useAuth";
+
 
 export default function StudentDashboard() {
   const { makeApiCall } = useAPICall();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const auth = useAuth();
+  const { user } = auth;
 
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await makeApiCall(
-          "GET",
-          ApiEndPoints.GET_ALL_COURSE,
-          null,
-          "application/json"
-        );
-        setCourses(response?.data?.courses || []);
-      } catch (e) {
-        console.error("Error fetching courses:", e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCourses();
-  }, [makeApiCall]);
+useEffect(() => {
+  if (!user?.id) return;
+
+  const fetchCourses = async () => {
+    try {
+      setLoading(true);
+
+      const response = await makeApiCall(
+        "GET",
+        ApiEndPoints.GET_COURSE_LIST(user.id),
+        null,
+        "application/json"
+      );
+
+      setCourses(response?.data?.data.course?.courses || []);
+    } catch (e) {
+      console.error("Error fetching courses:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchCourses();
+}, [makeApiCall, user?.id]);
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Greetings />
 
-      {/* Header */}
       <div className="mt-10 mb-6 flex items-end justify-between">
         <div className="space-y-1">
           <h2 className="text-2xl font-semibold tracking-tight text-foreground">
@@ -56,7 +65,6 @@ export default function StudentDashboard() {
         </Link>
       </div>
 
-      {/* Loading */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(3)].map((_, i) => (

@@ -31,4 +31,5 @@ export const ApiEndPoints = {
   UPLOAD_VIDEO: `${baseUrl}/upload/video`,
   UPLOAD_IMAGE: `${baseUrl}/upload/image`,
   VALIDATE_PROMO: `${baseUrl}/admin/verify-promocodes`,
+  GET_COURSE_LIST: (user_id: string) => `${baseUrl}/course/list/${user_id}`,
 };

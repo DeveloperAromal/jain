@@ -1,6 +1,5 @@
 import { supabase } from "../../../config/supabase.config.js";
 
-
 export async function createTopic({
   course_id,
   title,
@@ -48,7 +47,6 @@ export async function createTopic({
   return data[0];
 }
 
-
 export async function getTopicsByCourseID(course_id) {
   const { data, error } = await supabase
     .from("topics")
@@ -60,3 +58,15 @@ export async function getTopicsByCourseID(course_id) {
 
   return data;
 }
+
+export async function togleTopicFree(topic_id) {
+  const { data, error } = await supabase
+    .from("topics")
+    .update({ is_free })
+    .eq("topic_id", topic_id)
+    .select("*");
+
+  if (error) throw error;
+  return data;
+} 
+
