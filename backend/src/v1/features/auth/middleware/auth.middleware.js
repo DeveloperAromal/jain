@@ -1,4 +1,5 @@
 import { verifyJwtToken } from "../utils/jwt.js";
+import jwt from "jsonwebtoken";
 
 export const Protect = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -28,4 +29,22 @@ export const authorizeAdmin = (req, res, next) => {
     });
   }
   next();
+};
+
+export const streamAuth = (req, res, next) => {
+  const token = req.cookies?.token;
+  if (!token) {
+    console.log("No token in cookies");
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded token:", decoded); 
+    req.user = decoded;
+    next();
+  } catch (err) {
+    console.error("JWT verify failed:", err.message);
+    return res.status(401).json({ message: "Invalid token" });
+  }
 };

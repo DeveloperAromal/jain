@@ -125,6 +125,7 @@ export default function CoursePage() {
                 src={ApiEndPoints.GET_STREAM(user!.id, selectedTopic.id)}
                 controls
                 autoPlay
+                // crossOrigin="use-credentials"
                 className="w-full aspect-video bg-black"
               />
             ) : (

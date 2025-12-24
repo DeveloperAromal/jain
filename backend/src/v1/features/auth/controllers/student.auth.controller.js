@@ -2,13 +2,7 @@ import * as studentAuthService from "../services/student.auth.service.js";
 
 export const signUpStudent = async (req, res) => {
   try {
-    const {
-      email,
-      password,
-      phone,
-      name,
-      student_class,
-    } = req.body;
+    const { email, password, phone, name, student_class } = req.body;
 
     const result = await studentAuthService.signUpStudent({
       email,
@@ -47,7 +41,12 @@ export const signInStudent = async (req, res) => {
       email,
       password,
     });
-
+    res.cookie("token", result.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
     return res.status(200).json({
       success: true,
       message: "Signed in successfully",

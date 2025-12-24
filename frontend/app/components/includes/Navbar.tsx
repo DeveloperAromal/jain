@@ -31,7 +31,6 @@ export default function Navbar() {
         bg-white border-b border-black/5"
       >
         <div className="max-w-7xl mx-auto flex items-center">
-          {/* LOGO */}
           <Link
             href="/"
             className="text-xl sm:text-2xl font-bold tracking-tight hover:opacity-90 transition"
