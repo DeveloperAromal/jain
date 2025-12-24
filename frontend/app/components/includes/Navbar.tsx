@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-import AuthModal from "../modals/AuthModal";
 import Link from "next/link";
+import AuthModal from "../modals/AuthModal";
+import Image from "next/image";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -24,19 +25,23 @@ export default function Navbar() {
 
   return (
     <>
+      {/* NAVBAR */}
       <header
-        className="px-4 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-4 w-full fixed top-0 z-20 bg-white/60 backdrop-blur-2xl border-b border-black/5"
-        style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.06)" }}
+        className="fixed top-0 z-40 w-full px-4 sm:px-6 
+        bg-white border-b border-black/5"
       >
         <div className="max-w-7xl mx-auto flex items-center">
+          {/* LOGO */}
           <Link
             href="/"
             className="text-xl sm:text-2xl font-bold tracking-tight hover:opacity-90 transition"
           >
-            Jain
+            <Image src="/logo-white.png" alt="logo" width={70} height={70} />
           </Link>
 
+          {/* RIGHT */}
           <div className="ml-auto flex items-center gap-6">
+            {/* DESKTOP NAV */}
             <nav className="hidden md:flex gap-6 lg:gap-8">
               {navItems.map((item) => (
                 <Link
@@ -46,20 +51,28 @@ export default function Navbar() {
                       ? "/"
                       : `/${item.toLowerCase()}`
                   }
-                  className="relative text-sm lg:text-base font-medium text-text-secondary hover:text-foreground transition after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-foreground after:transition-all after:duration-300 hover:after:w-full"
+                  className="relative text-sm lg:text-base font-medium text-text-secondary
+                  hover:text-foreground transition
+                  after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0
+                  after:bg-foreground after:transition-all after:duration-300
+                  hover:after:w-full"
                 >
                   {item}
                 </Link>
               ))}
             </nav>
 
+            {/* SIGN UP BUTTON */}
             <button
-              className="hidden sm:block px-5 py-2.5 rounded-2xl text-sm lg:text-base font-medium bg-white/60 backdrop-blur-md border border-black/10 hover:bg-primary hover:text-white transition-all"
               onClick={() => setOpen(true)}
+              className="hidden sm:flex px-5 py-2.5 rounded-2xl text-sm lg:text-base font-medium
+              bg-white/70 backdrop-blur-md border border-black/10
+              hover:bg-primary hover:text-white transition-all"
             >
               Sign Up
             </button>
 
+            {/* MOBILE MENU TOGGLE */}
             <button
               className="md:hidden p-2 hover:bg-black/5 rounded-lg transition"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -74,8 +87,13 @@ export default function Navbar() {
           </div>
         </div>
 
+        {/* MOBILE MENU */}
         {mobileMenuOpen && (
-          <div className="md:hidden mt-4 px-4 pb-4 pt-4 bg-white/70 backdrop-blur-xl border-t border-black/5 rounded-2xl shadow-lg">
+          <div
+            className="md:hidden mt-4 px-4 pb-4 pt-4
+            bg-white/70 backdrop-blur-xl border-t border-black/5
+            rounded-2xl shadow-lg"
+          >
             <nav className="flex flex-col gap-4">
               {navItems.map((item) => (
                 <Link
@@ -91,8 +109,11 @@ export default function Navbar() {
                   {item}
                 </Link>
               ))}
+
               <button
-                className="py-2 px-4 rounded-2xl font-medium bg-white/60 backdrop-blur-md border border-black/10 hover:bg-primary hover:text-white transition"
+                className="py-2 px-4 rounded-2xl font-medium
+                bg-white/70 backdrop-blur-md border border-black/10
+                hover:bg-primary hover:text-white transition"
                 onClick={() => {
                   setOpen(true);
                   setMobileMenuOpen(false);
@@ -105,13 +126,14 @@ export default function Navbar() {
         )}
       </header>
 
+      {/* SIGN UP MODAL */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setOpen(false)}
           />
-          <div className="relative bg-background p-4 sm:p-6 w-full max-w-2xl rounded-3xl z-10 max-h-[90vh]">
+          <div className="relative bg-background w-full max-w-2xl rounded-3xl p-4 sm:p-6 z-10 max-h-[90vh] overflow-y-auto">
             <AuthModal />
           </div>
         </div>

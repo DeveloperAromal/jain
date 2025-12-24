@@ -68,12 +68,12 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pt-20">
       {/* HERO */}
       <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-100 to-transparent opacity-50" />
+        {/* <div className="absolute inset-0 bg-gradient-to-br from-orange-100 to-transparent opacity-50" />
         <div className="absolute top-20 left-10 w-24 h-24 bg-orange-200/40 rounded-full blur-2xl floating-animation" />
-        <div className="absolute bottom-20 right-10 w-32 h-32 bg-orange-300/30 rounded-full blur-2xl floating-animation" />
+        <div className="absolute bottom-20 right-10 w-32 h-32 bg-orange-300/30 rounded-full blur-2xl floating-animation" /> */}
 
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
