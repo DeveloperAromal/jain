@@ -1,62 +1,104 @@
-"use client";
+import Link from "next/link";
+import { BookOpen, Mail, Phone, MapPin } from "lucide-react";
 
-import { cn } from "@/lib/utils";
-import {
-  IconBrandGithub,
-  IconBrandInstagram,
-  IconBrandLinkedin,
-} from "@tabler/icons-react";
-
-export default function Footer({ className }: { className?: string }) {
+export default function Footer() {
   return (
-    <footer
-      className={cn(
-        "w-full border-t border-neutral-200 mt-10 dark:border-white/20 bg-white dark:bg-black",
-        className
-      )}
-    >
-      <div className="max-w-7xl mx-auto py-8 sm:py-10 px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-10">
-        <div>
-          <h2 className="text-lg sm:text-xl font-bold text-neutral-800 dark:text-neutral-200">
-            Jain Math Hub
-          </h2>
-          <p className="text-xs sm:text-sm mt-2 text-neutral-600 dark:text-neutral-300">
-            Building smooth & elegant user experiences.
-          </p>
-        </div>
+    <footer className="bg-secondary/30 border-t border-border mt-20">
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <BookOpen className="h-6 w-6 text-primary" />
+              <span className="text-xl font-bold">Learn With Jain</span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Your complete mathematics learning companion for Class 10, Plus
+              One, and Plus Two.
+            </p>
+          </div>
 
-        <div className="flex flex-col space-y-2">
-          <h3 className="font-semibold text-sm sm:text-base text-neutral-700 dark:text-neutral-200">
-            Quick Links
-          </h3>
-          <a className="text-xs sm:text-sm text-neutral-600 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition">
-            Home
-          </a>
-          <a className="text-xs sm:text-sm text-neutral-600 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition">
-            Services
-          </a>
-          <a className="text-xs sm:text-sm text-neutral-600 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition">
-            About
-          </a>
-          <a className="text-xs sm:text-sm text-neutral-600 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition">
-            Contact
-          </a>
-        </div>
+          <div>
+            <h3 className="font-semibold mb-4">Quick Links</h3>
+            <div className="space-y-2">
+              <Link
+                href="/"
+                className="block text-sm text-muted-foreground hover:text-primary transition"
+              >
+                Home
+              </Link>
+              <Link
+                href="/courses"
+                className="block text-sm text-muted-foreground hover:text-primary transition"
+              >
+                All Courses
+              </Link>
+              <Link
+                href="/about"
+                className="block text-sm text-muted-foreground hover:text-primary transition"
+              >
+                About Us
+              </Link>
+              <Link
+                href="/contact"
+                className="block text-sm text-muted-foreground hover:text-primary transition"
+              >
+                Contact
+              </Link>
+            </div>
+          </div>
 
-        <div>
-          <h3 className="font-semibold text-sm sm:text-base text-neutral-700 dark:text-neutral-200">
-            Follow Us
-          </h3>
-          <div className="flex space-x-4 mt-3">
-            <IconBrandGithub className="h-5 w-5 text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100 transition cursor-pointer" />
-            <IconBrandInstagram className="h-5 w-5 text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100 transition cursor-pointer" />
-            <IconBrandLinkedin className="h-5 w-5 text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100 transition cursor-pointer" />
+          <div>
+            <h3 className="font-semibold mb-4">Courses</h3>
+            <div className="space-y-2">
+              <Link
+                href="/plus-two"
+                className="block text-sm text-muted-foreground hover:text-primary transition"
+              >
+                Plus Two Mathematics
+              </Link>
+              <Link
+                href="/plus-one"
+                className="block text-sm text-muted-foreground hover:text-primary transition"
+              >
+                Plus One Mathematics
+              </Link>
+              <Link
+                href="/class-10"
+                className="block text-sm text-muted-foreground hover:text-primary transition"
+              >
+                Class 10 Mathematics
+              </Link>
+              <Link
+                href="/basics"
+                className="block text-sm text-muted-foreground hover:text-primary transition"
+              >
+                Basics of Mathematics
+              </Link>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-4">Contact</h3>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Mail className="h-4 w-4" />
+                <span>contact@learnwithjain.com</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Phone className="h-4 w-4" />
+                <span>+91 XXXXX XXXXX</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <MapPin className="h-4 w-4" />
+                <span>India</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="text-center py-4 sm:py-5 text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 border-t border-neutral-200 dark:border-white/20 px-4">
-        © {new Date().getFullYear()} Jain Math Hub. All rights reserved.
+        <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
+          © {new Date().getFullYear()} Learn With Jain. All rights reserved.
+        </div>
       </div>
     </footer>
   );
