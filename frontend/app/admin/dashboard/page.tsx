@@ -153,7 +153,7 @@ export default function AdminDashboard() {
               <div className="group bg-card rounded-2xl border border-border p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
                 <div className="flex items-center justify-between mb-4">
                   <div
-                    className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} bg-opacity-10 group-hover:bg-opacity-20 transition-all`}
+                    className={`p-3 rounded-xl bg-linear-to-r ${stat.color} bg-opacity-10 group-hover:bg-opacity-20 transition-all`}
                   >
                     <Icon
                       className={`w-6 h-6 ${stat.color

@@ -555,7 +555,7 @@ export default function CourseDetails() {
                 className="flex items-start gap-4 p-4 border border-neutral-900 rounded-lg hover:bg-bg-soft transition-colors"
               >
                 {topic.thumbnail_img && (
-                  <div className="relative w-24 h-16 sm:w-32 sm:h-20 rounded-lg overflow-hidden flex-shrink-0">
+                  <div className="relative w-24 h-16 sm:w-32 sm:h-20 rounded-lg overflow-hidden shrink-0">
                     <Image src={topic.thumbnail_img} alt={topic.title} fill />
                   </div>
                 )}
