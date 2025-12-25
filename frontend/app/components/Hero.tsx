@@ -68,9 +68,9 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col pt-20">
+    <div className="min-h-screen flex flex-col pt-8">
       {/* HERO */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
+      <section className="relative pt-20 pb-20 overflow-hidden">
         {/* <div className="absolute inset-0 bg-gradient-to-br from-orange-100 to-transparent opacity-50" />
         <div className="absolute top-20 left-10 w-24 h-24 bg-orange-200/40 rounded-full blur-2xl floating-animation" />
         <div className="absolute bottom-20 right-10 w-32 h-32 bg-orange-300/30 rounded-full blur-2xl floating-animation" /> */}
