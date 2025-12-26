@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import AuthModal from "../modals/AuthModal";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -26,7 +27,7 @@ export default function Navbar() {
       {/* HEADER */}
       <header
         className="
-          px-4 sm:px-6 md:px-8 lg:px-10 py-3 sm:py-4
+          px-4 sm:px-6 md:px-8 lg:px-10 py-1 sm:py-2
           w-full fixed top-0 z-20
           bg-white/60 backdrop-blur-2xl
           border-b border-black/5
@@ -38,7 +39,14 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* LOGO */}
           <div className="text-xl sm:text-2xl font-bold text-foreground tracking-tight hover:opacity-90 transition">
-            Jain
+<Image
+              src="/logo-white.png"
+              alt="Learning"
+              width={60}
+              height={60}
+  
+              priority
+            />
           </div>
 
           <nav className="hidden md:flex gap-6 lg:gap-8">
