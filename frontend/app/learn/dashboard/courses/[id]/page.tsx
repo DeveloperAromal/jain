@@ -114,7 +114,6 @@ export default function CoursePage() {
 
   return (
     <section className="w-full flex flex-col lg:flex-row lg:h-[calc(100vh-64px)] bg-background">
-      {/* Player */}
       <div className="lg:w-2/3 w-full border-b lg:border-b-0 lg:border-r border-border flex flex-col">
         <div className="w-full bg-black">
           <div className="max-w-5xl mx-auto">
