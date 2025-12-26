@@ -39,13 +39,13 @@ export default function CoursePage() {
   );
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const token = Cookies.get("token");
 
   const getTopics = useCallback(async () => {
     if (!user?.id || !courseId) return;
 
     try {
       setLoading(true);
-      const token = Cookies.get("token");
       if (!token) return;
 
       const response = (await makeApiCall(
@@ -123,7 +123,11 @@ export default function CoursePage() {
               <video
                 key={selectedTopic.id}
                 ref={videoRef}
-                src={ApiEndPoints.GET_STREAM(user!.id, selectedTopic.id)}
+                src={ApiEndPoints.GET_STREAM(
+                  user!.id,
+                  selectedTopic.id,
+                  token || ""
+                )}
                 controls
                 autoPlay
                 className="w-full aspect-video bg-black"
