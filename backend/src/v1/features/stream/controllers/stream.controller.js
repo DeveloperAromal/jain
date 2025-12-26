@@ -7,13 +7,13 @@ export async function streamAuthorizedVideo(req, res) {
     const { user_id, topic_id } = req.params;
     const range = req.headers.range;
 
-    const token = req.cookies?.token; 
-    
+    const {token} = req.query;
+
     if (!token) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    console.log(topic_id)
+    console.log(topic_id);
 
     const decoded = verifyJwtToken(token);
 

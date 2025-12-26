@@ -64,7 +64,11 @@ export default function Home() {
             <p className="text-xl font-semibold">
               Your Complete Mathematics Learning Companion
             </p>
-
+            <p>
+              Master mathematics from basics to advanced levels with our
+              comprehensive video courses designed for Plus Two, Plus One, and
+              Class 10 students.
+            </p>
             <div className="flex gap-4 flex-wrap">
               <Link
                 href="/courses"
