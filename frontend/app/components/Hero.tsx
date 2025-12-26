@@ -90,7 +90,7 @@ export default function Home() {
           </div>
 
           {/* Image */}
-          <div className="hidden md:flex justify-center">
+          <div className="md:flex justify-center">
             <Image
               src="/hero-education.jpg"
               alt="Learning"
