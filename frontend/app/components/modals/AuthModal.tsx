@@ -135,7 +135,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
             <input
               type="text"
               placeholder="eg: John Doe"
-              className="w-full px-4 py-1.5 border border-border rounded-lg"
+              className="w-full px-4 py-1.5 border border-border rounded-xl"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -150,7 +150,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
             <input
               type="tel"
               placeholder="Enter phone number"
-              className="w-full px-4 py-1.5 border border-border rounded-lg"
+              className="w-full px-4 py-1.5 border border-border rounded-xl"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
@@ -164,7 +164,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
           <input
             type="email"
             placeholder="eg: user@gmail.com"
-            className="w-full px-4 py-1.5 border border-border rounded-lg"
+            className="w-full px-4 py-1.5 border border-border rounded-xl"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -178,7 +178,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
             <input
               type="text"
               placeholder="eg: 10, 11, 12"
-              className="w-full px-4 py-1.5 border border-border rounded-lg"
+              className="w-full px-4 py-1.5 border border-border rounded-xl"
               value={studentClass}
               onChange={(e) => setStudentClass(e.target.value)}
             />
@@ -193,7 +193,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
-              className="w-full px-4 py-1.5 border border-border rounded-lg"
+              className="w-full px-4 py-1.5 border border-border rounded-xl"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -219,7 +219,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
                 placeholder="Confirm Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className={`w-full px-4 py-1.5 border rounded-lg ${
+                className={`w-full px-4 py-1.5 border rounded-xl ${
                   !isPassSame ? "border-red-500" : "border-border"
                 }`}
               />
@@ -247,7 +247,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
           <button
             disabled={!canSubmit}
             onClick={isLogin ? handleLogin : handleSignup}
-            className={`w-full py-3 rounded-lg text-white font-semibold transition-all bg-primary hover:bg-primary-hover shadow-sm`}
+            className={`w-full py-3 rounded-xl text-white font-semibold transition-all bg-primary hover:bg-primary-hover shadow-sm`}
           >
             Create Account
           </button>
