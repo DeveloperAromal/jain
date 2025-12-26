@@ -9,7 +9,7 @@ import Navbar from "./components/includes/Navbar";
 
 export default function LandingPage() {
   return (
-    <main suppressHydrationWarning={true} suppressContentEditableWarning>
+    <main suppressHydrationWarning={true}>
       <Navbar />
       <Hero />
       {/* <CourseWeOffer />
