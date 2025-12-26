@@ -10,12 +10,15 @@ import Navbar from "./components/includes/Navbar";
 export default function LandingPage() {
   return (
     <main suppressHydrationWarning={true}>
-      <Navbar />
+      {/* <Navbar /> */}
       {/* <Hero /> */}
       {/* <CourseWeOffer />
       <BentoGridThirdDemo />
       <CallToAction /> */}
-      <Footer />
+      {/* <Footer /> */}
+      <div>
+        <h2>hello</h2>
+      </div>
     </main>
   );
 }
